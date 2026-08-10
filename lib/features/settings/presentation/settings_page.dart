@@ -1,6 +1,7 @@
 import 'package:dosecheck/app/app_controller.dart';
 import 'package:dosecheck/core/widgets/content_frame.dart';
 import 'package:dosecheck/features/doses/domain/regimen_plan.dart';
+import 'package:dosecheck/features/reminders/application/reminder_service.dart';
 import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
@@ -8,9 +9,11 @@ class SettingsPage extends StatelessWidget {
   const SettingsPage({
     super.key,
     required this.controller,
+    required this.reminders,
   });
 
   final DoseCheckController controller;
+  final ReminderService reminders;
 
   @override
   Widget build(BuildContext context) {
@@ -54,29 +57,49 @@ class SettingsPage extends StatelessWidget {
               child: Text(l10n.editRoutine),
             ),
             const SizedBox(height: 38),
+            _SectionTitle(l10n.remindersSection),
+            const SizedBox(height: 8),
+            if (reminders.availability == ReminderAvailability.available)
+              _ReminderRow(
+                title: l10n.remindersEnabled,
+                body: l10n.remindersDescription,
+                value: controller.preferences.remindersEnabled,
+                enabled: !controller.isMutating,
+                onChanged: (value) => _setReminders(context, value),
+              )
+            else
+              _InformationBlock(
+                title: l10n.remindersEnabled,
+                body: l10n.notificationUnavailable,
+              ),
+            const SizedBox(height: 38),
             _SectionTitle(l10n.languageSection),
             const SizedBox(height: 8),
             _LanguageRow(
               label: l10n.languageSystem,
               selected: controller.preferences.languageCode == null,
+              enabled: !controller.isMutating,
               onTap: () => _changeLanguage(context, null),
             ),
             const Divider(),
             _LanguageRow(
               label: l10n.languageEnglish,
               selected: controller.preferences.languageCode == 'en',
+              enabled: !controller.isMutating,
               onTap: () => _changeLanguage(context, 'en'),
             ),
             const Divider(),
             _LanguageRow(
               label: l10n.languageFrench,
               selected: controller.preferences.languageCode == 'fr',
+              enabled: !controller.isMutating,
               onTap: () => _changeLanguage(context, 'fr'),
             ),
             const Divider(),
             _LanguageRow(
               label: l10n.languageArabic,
               selected: controller.preferences.languageCode == 'ar',
+              enabled: !controller.isMutating,
               onTap: () => _changeLanguage(context, 'ar'),
             ),
             const SizedBox(height: 38),
@@ -266,11 +289,67 @@ class SettingsPage extends StatelessWidget {
         SnackBar(content: Text(AppLocalizations.of(context).settingsSaved)),
       );
     } catch (_) {
+      _showLocalFailure(context);
+    }
+  }
+
+  Future<void> _setReminders(BuildContext context, bool enabled) async {
+    if (controller.isMutating ||
+        reminders.availability != ReminderAvailability.available ||
+        enabled == controller.preferences.remindersEnabled) {
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+
+    if (enabled) {
+      final granted = await reminders.requestPermission();
+      if (!context.mounted) {
+        return;
+      }
+      if (!granted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.notificationPermissionNeeded)),
+        );
+        return;
+      }
+
+      try {
+        await controller.setRemindersEnabled(true);
+        final now = DateTime.now();
+        await reminders.sync(
+          enabled: true,
+          regimen: controller.regimen,
+          today: controller.stateForDay(now, now: now),
+          messages: _reminderMessages(AppLocalizations.of(context)),
+          now: now,
+        );
+      } catch (_) {
+        try {
+          await controller.setRemindersEnabled(false);
+          await reminders.cancelAll();
+        } catch (_) {
+          // Preserve the original scheduling failure for the visible message.
+        }
+        if (!context.mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.notificationUnavailable)),
+        );
+      }
+      return;
+    }
+
+    try {
+      await reminders.cancelAll();
+      await controller.setRemindersEnabled(false);
+    } catch (_) {
       if (!context.mounted) {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).localDataErrorTitle)),
+        SnackBar(content: Text(l10n.notificationUnavailable)),
       );
     }
   }
@@ -283,12 +362,7 @@ class SettingsPage extends StatelessWidget {
     try {
       await controller.updateLanguage(code);
     } catch (_) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).localDataErrorTitle)),
-      );
+      _showLocalFailure(context);
     }
   }
 
@@ -321,6 +395,7 @@ class SettingsPage extends StatelessWidget {
     }
 
     try {
+      await reminders.cancelAll();
       await controller.resetLocalData();
       if (!context.mounted) {
         return;
@@ -329,13 +404,17 @@ class SettingsPage extends StatelessWidget {
         SnackBar(content: Text(AppLocalizations.of(context).dataResetSuccess)),
       );
     } catch (_) {
-      if (!context.mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).localDataErrorTitle)),
-      );
+      _showLocalFailure(context);
     }
+  }
+
+  void _showLocalFailure(BuildContext context) {
+    if (!context.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).localDataErrorTitle)),
+    );
   }
 }
 
@@ -383,15 +462,60 @@ class _SettingsRow extends StatelessWidget {
   }
 }
 
+class _ReminderRow extends StatelessWidget {
+  const _ReminderRow({
+    required this.title,
+    required this.body,
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final String title;
+  final String body;
+  final bool value;
+  final bool enabled;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.bodyLarge),
+                const SizedBox(height: 3),
+                Text(body, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
+          ),
+          const SizedBox(width: 18),
+          Switch.adaptive(
+            value: value,
+            onChanged: enabled ? onChanged : null,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _LanguageRow extends StatelessWidget {
   const _LanguageRow({
     required this.label,
     required this.selected,
+    required this.enabled,
     required this.onTap,
   });
 
   final String label;
   final bool selected;
+  final bool enabled;
   final VoidCallback onTap;
 
   @override
@@ -399,7 +523,7 @@ class _LanguageRow extends StatelessWidget {
     final theme = Theme.of(context);
 
     return InkWell(
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 52),
         child: Padding(
@@ -528,5 +652,18 @@ String _formatMinutes(BuildContext context, int minutes) {
   return MaterialLocalizations.of(context).formatTimeOfDay(
     TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60),
     alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+  );
+}
+
+ReminderMessages _reminderMessages(AppLocalizations l10n) {
+  return ReminderMessages(
+    channelName: l10n.remindersEnabled,
+    channelDescription: l10n.remindersDescription,
+    morningTitle: l10n.reminderMorningTitle,
+    morningBody: l10n.reminderMorningBody,
+    secondTitle: l10n.reminderSecondTitle,
+    secondBody: l10n.reminderSecondBody,
+    nightTitle: l10n.reminderNightTitle,
+    nightBody: l10n.reminderNightBody,
   );
 }
