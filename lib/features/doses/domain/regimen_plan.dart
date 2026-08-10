@@ -1,17 +1,46 @@
 class RegimenPlan {
-  const RegimenPlan({
+  const RegimenPlan._({
     required this.morningTabletCount,
     required this.morningTimeMinutes,
     required this.secondTabletCount,
     required this.secondMinimumIntervalMinutes,
     required this.nightInsulinUnits,
     required this.nightTimeMinutes,
-  })  : assert(morningTabletCount > 0),
-        assert(secondTabletCount > 0),
-        assert(morningTimeMinutes >= 0 && morningTimeMinutes < 24 * 60),
-        assert(nightTimeMinutes >= 0 && nightTimeMinutes < 24 * 60),
-        assert(secondMinimumIntervalMinutes > 0),
-        assert(nightInsulinUnits > 0);
+  });
+
+  factory RegimenPlan({
+    required int morningTabletCount,
+    required int morningTimeMinutes,
+    required int secondTabletCount,
+    required int secondMinimumIntervalMinutes,
+    required double nightInsulinUnits,
+    required int nightTimeMinutes,
+  }) {
+    _validatePositive(morningTabletCount, 'morningTabletCount');
+    _validateMinutesOfDay(morningTimeMinutes, 'morningTimeMinutes');
+    _validatePositive(secondTabletCount, 'secondTabletCount');
+    _validatePositive(
+      secondMinimumIntervalMinutes,
+      'secondMinimumIntervalMinutes',
+    );
+    if (!nightInsulinUnits.isFinite || nightInsulinUnits <= 0) {
+      throw ArgumentError.value(
+        nightInsulinUnits,
+        'nightInsulinUnits',
+        'Must be a positive finite number.',
+      );
+    }
+    _validateMinutesOfDay(nightTimeMinutes, 'nightTimeMinutes');
+
+    return RegimenPlan._(
+      morningTabletCount: morningTabletCount,
+      morningTimeMinutes: morningTimeMinutes,
+      secondTabletCount: secondTabletCount,
+      secondMinimumIntervalMinutes: secondMinimumIntervalMinutes,
+      nightInsulinUnits: nightInsulinUnits,
+      nightTimeMinutes: nightTimeMinutes,
+    );
+  }
 
   const RegimenPlan.initial()
       : morningTabletCount = 2,
@@ -65,9 +94,9 @@ class RegimenPlan {
   }
 
   factory RegimenPlan.fromMap(Map<String, dynamic> map) {
-    final version = map['schema_version'] as int? ?? 1;
-    if (version != schemaVersion) {
-      throw FormatException('Unsupported regimen schema version: $version');
+    final rawVersion = map['schema_version'] ?? 1;
+    if (rawVersion is! int || rawVersion != schemaVersion) {
+      throw FormatException('Unsupported regimen schema version: $rawVersion');
     }
 
     return RegimenPlan(
@@ -81,12 +110,28 @@ class RegimenPlan {
     );
   }
 
+  static void _validatePositive(int value, String name) {
+    if (value <= 0) {
+      throw ArgumentError.value(value, name, 'Must be greater than zero.');
+    }
+  }
+
+  static void _validateMinutesOfDay(int value, String name) {
+    if (value < 0 || value >= 24 * 60) {
+      throw ArgumentError.value(
+        value,
+        name,
+        'Must be between 0 and 1439.',
+      );
+    }
+  }
+
   static int _readInt(Map<String, dynamic> map, String key) {
     final value = map[key];
     if (value is int) {
       return value;
     }
-    if (value is num) {
+    if (value is num && value.isFinite && value == value.roundToDouble()) {
       return value.toInt();
     }
     throw FormatException('Missing or invalid regimen field: $key');
@@ -94,7 +139,7 @@ class RegimenPlan {
 
   static num _readNumber(Map<String, dynamic> map, String key) {
     final value = map[key];
-    if (value is num) {
+    if (value is num && value.isFinite) {
       return value;
     }
     throw FormatException('Missing or invalid regimen field: $key');
