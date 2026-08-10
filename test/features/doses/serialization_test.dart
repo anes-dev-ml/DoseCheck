@@ -54,11 +54,32 @@ void main() {
       expect(restored.occurredAtUtc.isUtc, isTrue);
     });
 
+    test('stores a whole-number pill amount on taken entries', () {
+      final source = DoseEvent.create(
+        slot: DoseSlot.morningPills,
+        type: DoseEventType.taken,
+        occurredAt: DateTime(2026, 8, 10, 8),
+        amount: 2,
+      );
+
+      expect(source.amount, 2);
+      expect(
+        () => DoseEvent.create(
+          slot: DoseSlot.morningPills,
+          type: DoseEventType.taken,
+          occurredAt: DateTime(2026, 8, 10, 8),
+          amount: 1.5,
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('rejects unknown storage values instead of guessing', () {
       final source = DoseEvent.create(
         slot: DoseSlot.morningPills,
         type: DoseEventType.taken,
         occurredAt: DateTime(2026, 8, 10, 8),
+        amount: 2,
       ).toMap();
 
       expect(
