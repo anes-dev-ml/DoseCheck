@@ -88,11 +88,16 @@ class DoseCheckController extends ChangeNotifier {
       return DoseMutationResult.unavailable;
     }
 
+    final recordedAmount = _recordedAmountFor(
+      slot: slot,
+      type: type,
+      suppliedAmount: amount,
+    );
     final event = DoseEvent.create(
       slot: slot,
       type: type,
       occurredAt: timestamp,
-      amount: amount,
+      amount: recordedAmount,
     );
 
     _setMutating(true);
@@ -202,6 +207,30 @@ class DoseCheckController extends ChangeNotifier {
     } finally {
       _setMutating(false);
     }
+  }
+
+  double? _recordedAmountFor({
+    required DoseSlot slot,
+    required DoseEventType type,
+    required double? suppliedAmount,
+  }) {
+    if (type != DoseEventType.taken) {
+      if (suppliedAmount != null) {
+        throw ArgumentError.value(
+          suppliedAmount,
+          'amount',
+          'Only taken entries may include an amount.',
+        );
+      }
+      return null;
+    }
+
+    return switch (slot) {
+      DoseSlot.morningPills => _regimen.morningTabletCount.toDouble(),
+      DoseSlot.secondPills => _regimen.secondTabletCount.toDouble(),
+      DoseSlot.nightInsulin =>
+        suppliedAmount ?? (throw ArgumentError.notNull('amount')),
+    };
   }
 
   Future<void> _bestEffortReload() async {
