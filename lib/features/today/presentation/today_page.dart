@@ -1,10 +1,16 @@
+import 'package:dosecheck/app/app_controller.dart';
 import 'package:dosecheck/core/design/dosecheck_mark.dart';
 import 'package:dosecheck/core/widgets/content_frame.dart';
 import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class TodayPage extends StatelessWidget {
-  const TodayPage({super.key});
+  const TodayPage({
+    super.key,
+    required this.controller,
+  });
+
+  final DoseCheckController controller;
 
   @override
   Widget build(BuildContext context) {
