@@ -1,8 +1,19 @@
 class AppPreferences {
-  const AppPreferences({
+  const AppPreferences._({
     required this.languageCode,
     required this.remindersEnabled,
   });
+
+  factory AppPreferences({
+    required String? languageCode,
+    required bool remindersEnabled,
+  }) {
+    _validateLanguage(languageCode);
+    return AppPreferences._(
+      languageCode: languageCode,
+      remindersEnabled: remindersEnabled,
+    );
+  }
 
   const AppPreferences.initial()
       : languageCode = null,
@@ -19,8 +30,8 @@ class AppPreferences {
     bool clearLanguageCode = false,
     bool? remindersEnabled,
   }) {
-    final nextLanguageCode = clearLanguageCode ? null : languageCode ?? this.languageCode;
-    _validateLanguage(nextLanguageCode);
+    final nextLanguageCode =
+        clearLanguageCode ? null : languageCode ?? this.languageCode;
 
     return AppPreferences(
       languageCode: nextLanguageCode,
@@ -54,15 +65,13 @@ class AppPreferences {
     }
 
     try {
-      _validateLanguage(languageCode as String?);
+      return AppPreferences(
+        languageCode: languageCode as String?,
+        remindersEnabled: remindersEnabled,
+      );
     } on ArgumentError catch (error) {
       throw FormatException('Invalid language preference: ${error.message}');
     }
-
-    return AppPreferences(
-      languageCode: languageCode,
-      remindersEnabled: remindersEnabled,
-    );
   }
 
   static void _validateLanguage(String? value) {
