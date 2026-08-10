@@ -8,7 +8,7 @@ import 'package:dosecheck/features/settings/domain/app_preferences.dart';
 
 class InMemoryDoseRepository implements DoseRepository {
   InMemoryDoseRepository({List<DoseEvent>? initialEvents})
-      : events = [...?initialEvents];
+    : events = [...?initialEvents];
 
   final List<DoseEvent> events;
   Completer<void>? appendBarrier;
@@ -40,8 +40,8 @@ class InMemorySettingsRepository implements SettingsRepository {
   InMemorySettingsRepository({
     RegimenPlan? regimen,
     AppPreferences? preferences,
-  })  : regimen = regimen ?? const RegimenPlan.initial(),
-        preferences = preferences ?? const AppPreferences.initial();
+  }) : regimen = regimen ?? const RegimenPlan.initial(),
+       preferences = preferences ?? const AppPreferences.initial();
 
   RegimenPlan regimen;
   AppPreferences preferences;

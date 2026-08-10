@@ -26,30 +26,30 @@ abstract final class AppColors {
 
 abstract final class AppTheme {
   static ThemeData get light => _build(
-        brightness: Brightness.light,
-        canvas: AppColors.canvas,
-        surface: AppColors.surface,
-        ink: AppColors.ink,
-        mutedInk: AppColors.mutedInk,
-        line: AppColors.line,
-        accent: AppColors.accent,
-        accentSoft: AppColors.accentSoft,
-        danger: AppColors.danger,
-        dangerSoft: AppColors.dangerSoft,
-      );
+    brightness: Brightness.light,
+    canvas: AppColors.canvas,
+    surface: AppColors.surface,
+    ink: AppColors.ink,
+    mutedInk: AppColors.mutedInk,
+    line: AppColors.line,
+    accent: AppColors.accent,
+    accentSoft: AppColors.accentSoft,
+    danger: AppColors.danger,
+    dangerSoft: AppColors.dangerSoft,
+  );
 
   static ThemeData get dark => _build(
-        brightness: Brightness.dark,
-        canvas: AppColors.darkCanvas,
-        surface: AppColors.darkSurface,
-        ink: AppColors.darkInk,
-        mutedInk: AppColors.darkMutedInk,
-        line: AppColors.darkLine,
-        accent: AppColors.darkAccent,
-        accentSoft: AppColors.darkAccentSoft,
-        danger: AppColors.darkDanger,
-        dangerSoft: AppColors.darkDangerSoft,
-      );
+    brightness: Brightness.dark,
+    canvas: AppColors.darkCanvas,
+    surface: AppColors.darkSurface,
+    ink: AppColors.darkInk,
+    mutedInk: AppColors.darkMutedInk,
+    line: AppColors.darkLine,
+    accent: AppColors.darkAccent,
+    accentSoft: AppColors.darkAccentSoft,
+    danger: AppColors.darkDanger,
+    dangerSoft: AppColors.darkDangerSoft,
+  );
 
   static ThemeData _build({
     required Brightness brightness,
@@ -72,8 +72,9 @@ abstract final class AppTheme {
       onPrimaryContainer: ink,
       secondary: mutedInk,
       onSecondary: surface,
-      secondaryContainer:
-          isLight ? const Color(0xFFE7EAE6) : const Color(0xFF29312C),
+      secondaryContainer: isLight
+          ? const Color(0xFFE7EAE6)
+          : const Color(0xFF29312C),
       onSecondaryContainer: ink,
       error: danger,
       onError: isLight ? Colors.white : AppColors.ink,
@@ -189,7 +190,9 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           minimumSize: const Size(0, 48),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           textStyle: textTheme.labelLarge,
         ),
       ),
@@ -198,14 +201,18 @@ abstract final class AppTheme {
           minimumSize: const Size(0, 48),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
           side: BorderSide(color: line),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           textStyle: textTheme.labelLarge,
         ),
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
           minimumSize: const Size.square(44),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(13),
+          ),
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(

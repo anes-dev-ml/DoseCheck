@@ -22,9 +22,7 @@ class LocalReminderService implements ReminderService {
     if (kIsWeb ||
         (defaultTargetPlatform != TargetPlatform.android &&
             defaultTargetPlatform != TargetPlatform.iOS)) {
-      return const UnavailableReminderService(
-        ReminderAvailability.unsupported,
-      );
+      return const UnavailableReminderService(ReminderAvailability.unsupported);
     }
 
     try {
@@ -44,9 +42,7 @@ class LocalReminderService implements ReminderService {
       await plugin.initialize(settings: settings);
       return LocalReminderService._(plugin);
     } catch (_) {
-      return const UnavailableReminderService(
-        ReminderAvailability.unavailable,
-      );
+      return const UnavailableReminderService(ReminderAvailability.unavailable);
     }
   }
 
@@ -58,7 +54,8 @@ class LocalReminderService implements ReminderService {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return await _plugin
               .resolvePlatformSpecificImplementation<
-                  AndroidFlutterLocalNotificationsPlugin>()
+                AndroidFlutterLocalNotificationsPlugin
+              >()
               ?.requestNotificationsPermission() ??
           false;
     }
@@ -66,12 +63,9 @@ class LocalReminderService implements ReminderService {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _plugin
               .resolvePlatformSpecificImplementation<
-                  IOSFlutterLocalNotificationsPlugin>()
-              ?.requestPermissions(
-                alert: true,
-                badge: false,
-                sound: true,
-              ) ??
+                IOSFlutterLocalNotificationsPlugin
+              >()
+              ?.requestPermissions(alert: true, badge: false, sound: true) ??
           false;
     }
 
@@ -116,9 +110,9 @@ class LocalReminderService implements ReminderService {
     final availableAt = today.second.availableAt;
     final shouldScheduleSecond =
         today.morning.event?.type == DoseEventType.taken &&
-            today.second.resolution == DoseResolution.pending &&
-            availableAt != null &&
-            availableAt.isAfter(reference.toLocal());
+        today.second.resolution == DoseResolution.pending &&
+        availableAt != null &&
+        availableAt.isAfter(reference.toLocal());
 
     if (shouldScheduleSecond) {
       await _plugin.zonedSchedule(

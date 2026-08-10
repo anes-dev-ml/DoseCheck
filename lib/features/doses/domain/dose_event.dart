@@ -73,7 +73,9 @@ class DoseEvent {
   factory DoseEvent.fromMap(Map<String, dynamic> map) {
     final rawVersion = map['schema_version'] ?? 1;
     if (rawVersion is! int || rawVersion != schemaVersion) {
-      throw FormatException('Unsupported dose event schema version: $rawVersion');
+      throw FormatException(
+        'Unsupported dose event schema version: $rawVersion',
+      );
     }
 
     final id = map['id'];
@@ -172,12 +174,6 @@ class DoseEvent {
   }
 
   @override
-  int get hashCode => Object.hash(
-        id,
-        localDayKey,
-        slot,
-        type,
-        occurredAtUtc,
-        amount,
-      );
+  int get hashCode =>
+      Object.hash(id, localDayKey, slot, type, occurredAtUtc, amount);
 }

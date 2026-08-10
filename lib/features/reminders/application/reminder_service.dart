@@ -23,11 +23,7 @@ class ReminderMessages {
   final String nightBody;
 }
 
-enum ReminderAvailability {
-  available,
-  unsupported,
-  unavailable,
-}
+enum ReminderAvailability { available, unsupported, unavailable }
 
 abstract interface class ReminderService {
   ReminderAvailability get availability;

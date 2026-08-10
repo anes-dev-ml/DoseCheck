@@ -37,7 +37,9 @@ class HiveSettingsRepository implements SettingsRepository {
       return const AppPreferences.initial();
     }
     if (value is! Map) {
-      throw const FormatException('Invalid preferences value in settings store');
+      throw const FormatException(
+        'Invalid preferences value in settings store',
+      );
     }
 
     return AppPreferences.fromMap(Map<String, dynamic>.from(value));

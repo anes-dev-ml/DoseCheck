@@ -16,8 +16,8 @@ class AppPreferences {
   }
 
   const AppPreferences.initial()
-      : languageCode = null,
-        remindersEnabled = false;
+    : languageCode = null,
+      remindersEnabled = false;
 
   static const int schemaVersion = 1;
   static const supportedLanguageCodes = {'en', 'fr', 'ar'};
@@ -30,8 +30,9 @@ class AppPreferences {
     bool clearLanguageCode = false,
     bool? remindersEnabled,
   }) {
-    final nextLanguageCode =
-        clearLanguageCode ? null : languageCode ?? this.languageCode;
+    final nextLanguageCode = clearLanguageCode
+        ? null
+        : languageCode ?? this.languageCode;
 
     return AppPreferences(
       languageCode: nextLanguageCode,

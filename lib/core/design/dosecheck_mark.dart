@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DoseCheckMark extends StatelessWidget {
-  const DoseCheckMark({
-    super.key,
-    this.size = 32,
-    this.color,
-  });
+  const DoseCheckMark({super.key, this.size = 32, this.color});
 
   final double size;
   final Color? color;

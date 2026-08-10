@@ -45,23 +45,14 @@ void main() {
   }
 
   testWidgets('English uses left-to-right layout', (tester) async {
-    expect(
-      await directionFor(tester, 'en', 'Today'),
-      TextDirection.ltr,
-    );
+    expect(await directionFor(tester, 'en', 'Today'), TextDirection.ltr);
   });
 
   testWidgets('French uses left-to-right layout', (tester) async {
-    expect(
-      await directionFor(tester, 'fr', 'Aujourd’hui'),
-      TextDirection.ltr,
-    );
+    expect(await directionFor(tester, 'fr', 'Aujourd’hui'), TextDirection.ltr);
   });
 
   testWidgets('Arabic uses right-to-left layout', (tester) async {
-    expect(
-      await directionFor(tester, 'ar', 'اليوم'),
-      TextDirection.rtl,
-    );
+    expect(await directionFor(tester, 'ar', 'اليوم'), TextDirection.rtl);
   });
 }

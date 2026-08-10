@@ -16,9 +16,7 @@ class HiveDoseRepository implements DoseRepository {
         throw const FormatException('Invalid value in the dose event store');
       }
 
-      events.add(
-        DoseEvent.fromMap(Map<String, dynamic>.from(value)),
-      );
+      events.add(DoseEvent.fromMap(Map<String, dynamic>.from(value)));
     }
 
     events.sort((a, b) => a.occurredAtUtc.compareTo(b.occurredAtUtc));

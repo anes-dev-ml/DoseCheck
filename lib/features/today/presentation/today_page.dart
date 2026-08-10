@@ -11,10 +11,7 @@ import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class TodayPage extends StatefulWidget {
-  const TodayPage({
-    super.key,
-    required this.controller,
-  });
+  const TodayPage({super.key, required this.controller});
 
   final DoseCheckController controller;
 
@@ -72,16 +69,8 @@ class _TodayPageState extends State<TodayPage> {
             _DoseTimelineEntry(
               state: state.morning,
               title: l10n.morningPills,
-              amount: _amountFor(
-                context,
-                state.morning,
-                DoseSlot.morningPills,
-              ),
-              detail: _detailFor(
-                context,
-                state.morning,
-                DoseSlot.morningPills,
-              ),
+              amount: _amountFor(context, state.morning, DoseSlot.morningPills),
+              detail: _detailFor(context, state.morning, DoseSlot.morningPills),
               isLast: false,
               isBusy: widget.controller.isMutating,
               onTaken: () => _recordTaken(DoseSlot.morningPills),
@@ -90,16 +79,8 @@ class _TodayPageState extends State<TodayPage> {
             _DoseTimelineEntry(
               state: state.second,
               title: l10n.secondPills,
-              amount: _amountFor(
-                context,
-                state.second,
-                DoseSlot.secondPills,
-              ),
-              detail: _detailFor(
-                context,
-                state.second,
-                DoseSlot.secondPills,
-              ),
+              amount: _amountFor(context, state.second, DoseSlot.secondPills),
+              detail: _detailFor(context, state.second, DoseSlot.secondPills),
               isLast: false,
               isBusy: widget.controller.isMutating,
               onTaken: () => _recordTaken(DoseSlot.secondPills),
@@ -108,16 +89,8 @@ class _TodayPageState extends State<TodayPage> {
             _DoseTimelineEntry(
               state: state.night,
               title: l10n.nightInsulin,
-              amount: _amountFor(
-                context,
-                state.night,
-                DoseSlot.nightInsulin,
-              ),
-              detail: _detailFor(
-                context,
-                state.night,
-                DoseSlot.nightInsulin,
-              ),
+              amount: _amountFor(context, state.night, DoseSlot.nightInsulin),
+              detail: _detailFor(context, state.night, DoseSlot.nightInsulin),
               isLast: true,
               isBusy: widget.controller.isMutating,
               onTaken: () => _recordTaken(DoseSlot.nightInsulin),
@@ -129,11 +102,7 @@ class _TodayPageState extends State<TodayPage> {
     );
   }
 
-  String _amountFor(
-    BuildContext context,
-    DoseSlotState state,
-    DoseSlot slot,
-  ) {
+  String _amountFor(BuildContext context, DoseSlotState state, DoseSlot slot) {
     final l10n = AppLocalizations.of(context);
     final recorded = state.resolution == DoseResolution.taken
         ? state.event?.amount
@@ -141,22 +110,18 @@ class _TodayPageState extends State<TodayPage> {
 
     return switch (slot) {
       DoseSlot.morningPills => l10n.tabletsAmount(
-          recorded?.round() ?? widget.controller.regimen.morningTabletCount,
-        ),
+        recorded?.round() ?? widget.controller.regimen.morningTabletCount,
+      ),
       DoseSlot.secondPills => l10n.tabletsAmount(
-          recorded?.round() ?? widget.controller.regimen.secondTabletCount,
-        ),
+        recorded?.round() ?? widget.controller.regimen.secondTabletCount,
+      ),
       DoseSlot.nightInsulin => l10n.insulinUnits(
-          recorded ?? widget.controller.regimen.nightInsulinUnits,
-        ),
+        recorded ?? widget.controller.regimen.nightInsulinUnits,
+      ),
     };
   }
 
-  String _detailFor(
-    BuildContext context,
-    DoseSlotState state,
-    DoseSlot slot,
-  ) {
+  String _detailFor(BuildContext context, DoseSlotState state, DoseSlot slot) {
     final l10n = AppLocalizations.of(context);
     final event = state.event;
 
@@ -203,11 +168,7 @@ class _TodayPageState extends State<TodayPage> {
       }
     }
 
-    await _performRecord(
-      slot: slot,
-      type: DoseEventType.taken,
-      amount: amount,
-    );
+    await _performRecord(slot: slot, type: DoseEventType.taken, amount: amount);
   }
 
   Future<void> _recordOtherStatus(DoseSlot slot) async {
@@ -229,18 +190,13 @@ class _TodayPageState extends State<TodayPage> {
                 ),
                 const SizedBox(height: 18),
                 OutlinedButton(
-                  onPressed: () => Navigator.pop(
-                    context,
-                    DoseEventType.uncertain,
-                  ),
+                  onPressed: () =>
+                      Navigator.pop(context, DoseEventType.uncertain),
                   child: Text(l10n.markUncertain),
                 ),
                 const SizedBox(height: 10),
                 OutlinedButton(
-                  onPressed: () => Navigator.pop(
-                    context,
-                    DoseEventType.missed,
-                  ),
+                  onPressed: () => Navigator.pop(context, DoseEventType.missed),
                   child: Text(l10n.markMissed),
                 ),
               ],
@@ -320,8 +276,7 @@ class _TodayPageState extends State<TodayPage> {
                           label: l10n.increaseUnits,
                           button: true,
                           child: IconButton.outlined(
-                            onPressed: () =>
-                                setSheetState(() => amount += 0.5),
+                            onPressed: () => setSheetState(() => amount += 0.5),
                             icon: const Icon(Icons.add_rounded),
                           ),
                         ),
@@ -368,7 +323,9 @@ class _TodayPageState extends State<TodayPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).localDataErrorTitle)),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).localDataErrorTitle),
+        ),
       );
     }
   }
@@ -436,10 +393,7 @@ class _TodayPageState extends State<TodayPage> {
 }
 
 class _DaySummary extends StatelessWidget {
-  const _DaySummary({
-    required this.state,
-    required this.l10n,
-  });
+  const _DaySummary({required this.state, required this.l10n});
 
   final DoseDayState state;
   final AppLocalizations l10n;
@@ -450,10 +404,10 @@ class _DaySummary extends StatelessWidget {
     final (color, message) = state.hasUncertainty
         ? (_warningColor(theme), l10n.uncertaintyPresent)
         : state.hasMissed
-            ? (theme.colorScheme.error, l10n.missed)
-            : state.hasPending
-                ? (theme.colorScheme.primary, l10n.needsAttention)
-                : (theme.colorScheme.primary, l10n.allResolved);
+        ? (theme.colorScheme.error, l10n.missed)
+        : state.hasPending
+        ? (theme.colorScheme.primary, l10n.needsAttention)
+        : (theme.colorScheme.primary, l10n.allResolved);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,

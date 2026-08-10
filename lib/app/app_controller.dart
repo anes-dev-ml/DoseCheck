@@ -7,12 +7,7 @@ import 'package:dosecheck/features/settings/data/settings_repository.dart';
 import 'package:dosecheck/features/settings/domain/app_preferences.dart';
 import 'package:flutter/foundation.dart';
 
-enum DoseMutationResult {
-  saved,
-  alreadyResolved,
-  unavailable,
-  busy,
-}
+enum DoseMutationResult { saved, alreadyResolved, unavailable, busy }
 
 class DoseCheckController extends ChangeNotifier {
   DoseCheckController._({
@@ -21,11 +16,11 @@ class DoseCheckController extends ChangeNotifier {
     required List<DoseEvent> events,
     required RegimenPlan regimen,
     required AppPreferences preferences,
-  })  : _doseRepository = doseRepository,
-        _settingsRepository = settingsRepository,
-        _events = events,
-        _regimen = regimen,
-        _preferences = preferences;
+  }) : _doseRepository = doseRepository,
+       _settingsRepository = settingsRepository,
+       _events = events,
+       _regimen = regimen,
+       _preferences = preferences;
 
   final DoseRepository _doseRepository;
   final SettingsRepository _settingsRepository;
@@ -73,7 +68,11 @@ class DoseCheckController extends ChangeNotifier {
     DateTime? occurredAt,
   }) async {
     if (type == DoseEventType.cleared) {
-      throw ArgumentError.value(type, 'type', 'Use correctEntry for corrections.');
+      throw ArgumentError.value(
+        type,
+        'type',
+        'Use correctEntry for corrections.',
+      );
     }
     if (_isMutating) {
       return DoseMutationResult.busy;

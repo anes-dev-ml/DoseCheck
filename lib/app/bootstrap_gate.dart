@@ -47,10 +47,7 @@ class _DoseCheckBootstrapGateState extends State<DoseCheckBootstrapGate> {
 }
 
 class _BootstrapMaterialApp extends StatelessWidget {
-  const _BootstrapMaterialApp({
-    required this.hasError,
-    required this.onRetry,
-  });
+  const _BootstrapMaterialApp({required this.hasError, required this.onRetry});
 
   final bool hasError;
   final VoidCallback onRetry;
@@ -107,10 +104,7 @@ class _BootstrapLoading extends StatelessWidget {
 }
 
 class _BootstrapError extends StatelessWidget {
-  const _BootstrapError({
-    required this.l10n,
-    required this.onRetry,
-  });
+  const _BootstrapError({required this.l10n, required this.onRetry});
 
   final AppLocalizations l10n;
   final VoidCallback onRetry;
@@ -133,10 +127,7 @@ class _BootstrapError extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(height: 24),
-        FilledButton(
-          onPressed: onRetry,
-          child: Text(l10n.retry),
-        ),
+        FilledButton(onPressed: onRetry, child: Text(l10n.retry)),
       ],
     );
   }

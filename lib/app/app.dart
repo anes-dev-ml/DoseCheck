@@ -6,10 +6,7 @@ import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class DoseCheckApp extends StatelessWidget {
-  const DoseCheckApp({
-    super.key,
-    required this.runtime,
-  });
+  const DoseCheckApp({super.key, required this.runtime});
 
   final DoseCheckRuntime runtime;
 

@@ -21,8 +21,5 @@ Future<DoseCheckRuntime> bootstrapDoseCheck() async {
 
   final reminders = await LocalReminderService.create();
 
-  return DoseCheckRuntime(
-    controller: controller,
-    reminders: reminders,
-  );
+  return DoseCheckRuntime(controller: controller, reminders: reminders);
 }

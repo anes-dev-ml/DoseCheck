@@ -74,9 +74,7 @@ void main() {
         plan: plan,
         day: day,
         now: DateTime(2026, 8, 10, 16),
-        events: [
-          event(DoseSlot.morningPills, DoseEventType.uncertain, 9),
-        ],
+        events: [event(DoseSlot.morningPills, DoseEventType.uncertain, 9)],
       );
 
       expect(state.morning.resolution, DoseResolution.uncertain);
@@ -120,19 +118,20 @@ void main() {
       expect(state.morning.event?.type, DoseEventType.uncertain);
     });
 
-    test('an existing second entry is displayed even without a morning event', () {
-      final state = DoseDayState.derive(
-        plan: plan,
-        day: day,
-        now: DateTime(2026, 8, 10, 18),
-        events: [
-          event(DoseSlot.secondPills, DoseEventType.taken, 16),
-        ],
-      );
+    test(
+      'an existing second entry is displayed even without a morning event',
+      () {
+        final state = DoseDayState.derive(
+          plan: plan,
+          day: day,
+          now: DateTime(2026, 8, 10, 18),
+          events: [event(DoseSlot.secondPills, DoseEventType.taken, 16)],
+        );
 
-      expect(state.second.resolution, DoseResolution.taken);
-      expect(state.second.isActionLocked, isFalse);
-      expect(state.loggedCount, 1);
-    });
+        expect(state.second.resolution, DoseResolution.taken);
+        expect(state.second.isActionLocked, isFalse);
+        expect(state.loggedCount, 1);
+      },
+    );
   });
 }

@@ -3,12 +3,7 @@ import 'package:dosecheck/features/doses/domain/dose_event.dart';
 import 'package:dosecheck/features/doses/domain/dose_slot.dart';
 import 'package:dosecheck/features/doses/domain/regimen_plan.dart';
 
-enum DoseResolution {
-  pending,
-  taken,
-  missed,
-  uncertain,
-}
+enum DoseResolution { pending, taken, missed, uncertain }
 
 class DoseSlotState {
   const DoseSlotState({
@@ -70,10 +65,9 @@ class DoseDayState {
     required Iterable<DoseEvent> events,
   }) {
     final key = localDayKeyFor(day);
-    final relevantEvents = events
-        .where((event) => event.localDayKey == key)
-        .toList()
-      ..sort((a, b) => a.occurredAtUtc.compareTo(b.occurredAtUtc));
+    final relevantEvents =
+        events.where((event) => event.localDayKey == key).toList()
+          ..sort((a, b) => a.occurredAtUtc.compareTo(b.occurredAtUtc));
 
     final morningEvent = _latestEffectiveEvent(
       relevantEvents,
@@ -100,9 +94,9 @@ class DoseDayState {
 
     if (secondEvent == null) {
       if (morningEvent?.type == DoseEventType.taken) {
-        secondAvailableAt = morningEvent!.occurredAtUtc
-            .toLocal()
-            .add(plan.secondMinimumInterval);
+        secondAvailableAt = morningEvent!.occurredAtUtc.toLocal().add(
+          plan.secondMinimumInterval,
+        );
         isSecondLocked = now.toLocal().isBefore(secondAvailableAt);
       } else {
         isSecondLocked = true;
@@ -133,10 +127,7 @@ class DoseDayState {
   }
 }
 
-DoseEvent? _latestEffectiveEvent(
-  Iterable<DoseEvent> events,
-  DoseSlot slot,
-) {
+DoseEvent? _latestEffectiveEvent(Iterable<DoseEvent> events, DoseSlot slot) {
   DoseEvent? effective;
 
   for (final event in events) {

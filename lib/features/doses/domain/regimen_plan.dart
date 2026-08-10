@@ -43,12 +43,12 @@ class RegimenPlan {
   }
 
   const RegimenPlan.initial()
-      : morningTabletCount = 2,
-        morningTimeMinutes = 8 * 60,
-        secondTabletCount = 2,
-        secondMinimumIntervalMinutes = 6 * 60,
-        nightInsulinUnits = 8,
-        nightTimeMinutes = 22 * 60;
+    : morningTabletCount = 2,
+      morningTimeMinutes = 8 * 60,
+      secondTabletCount = 2,
+      secondMinimumIntervalMinutes = 6 * 60,
+      nightInsulinUnits = 8,
+      nightTimeMinutes = 22 * 60;
 
   static const int schemaVersion = 1;
 
@@ -103,8 +103,10 @@ class RegimenPlan {
       morningTabletCount: _readInt(map, 'morning_tablet_count'),
       morningTimeMinutes: _readInt(map, 'morning_time_minutes'),
       secondTabletCount: _readInt(map, 'second_tablet_count'),
-      secondMinimumIntervalMinutes:
-          _readInt(map, 'second_minimum_interval_minutes'),
+      secondMinimumIntervalMinutes: _readInt(
+        map,
+        'second_minimum_interval_minutes',
+      ),
       nightInsulinUnits: _readNumber(map, 'night_insulin_units').toDouble(),
       nightTimeMinutes: _readInt(map, 'night_time_minutes'),
     );
@@ -118,11 +120,7 @@ class RegimenPlan {
 
   static void _validateMinutesOfDay(int value, String name) {
     if (value < 0 || value >= 24 * 60) {
-      throw ArgumentError.value(
-        value,
-        name,
-        'Must be between 0 and 1439.',
-      );
+      throw ArgumentError.value(value, name, 'Must be between 0 and 1439.');
     }
   }
 
@@ -158,11 +156,11 @@ class RegimenPlan {
 
   @override
   int get hashCode => Object.hash(
-        morningTabletCount,
-        morningTimeMinutes,
-        secondTabletCount,
-        secondMinimumIntervalMinutes,
-        nightInsulinUnits,
-        nightTimeMinutes,
-      );
+    morningTabletCount,
+    morningTimeMinutes,
+    secondTabletCount,
+    secondMinimumIntervalMinutes,
+    nightInsulinUnits,
+    nightTimeMinutes,
+  );
 }

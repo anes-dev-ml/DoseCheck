@@ -34,19 +34,22 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 8),
             _SettingsRow(
               title: l10n.morningPills,
-              value: '${l10n.tabletsAmount(plan.morningTabletCount)} · '
+              value:
+                  '${l10n.tabletsAmount(plan.morningTabletCount)} · '
                   '${_formatMinutes(context, plan.morningTimeMinutes)}',
             ),
             const Divider(),
             _SettingsRow(
               title: l10n.secondPills,
-              value: '${l10n.tabletsAmount(plan.secondTabletCount)} · '
+              value:
+                  '${l10n.tabletsAmount(plan.secondTabletCount)} · '
                   '${l10n.minimumIntervalLabel(plan.secondMinimumIntervalMinutes ~/ 60)}',
             ),
             const Divider(),
             _SettingsRow(
               title: l10n.nightInsulin,
-              value: '${l10n.insulinUnits(plan.nightInsulinUnits)} · '
+              value:
+                  '${l10n.insulinUnits(plan.nightInsulinUnits)} · '
                   '${_formatMinutes(context, plan.nightTimeMinutes)}',
             ),
             const SizedBox(height: 12),
@@ -105,15 +108,9 @@ class SettingsPage extends StatelessWidget {
             const SizedBox(height: 38),
             _SectionTitle(l10n.aboutSection),
             const SizedBox(height: 14),
-            _InformationBlock(
-              title: l10n.safetyTitle,
-              body: l10n.safetyBody,
-            ),
+            _InformationBlock(title: l10n.safetyTitle, body: l10n.safetyBody),
             const SizedBox(height: 22),
-            _InformationBlock(
-              title: l10n.privacyTitle,
-              body: l10n.privacyBody,
-            ),
+            _InformationBlock(title: l10n.privacyTitle, body: l10n.privacyBody),
             const SizedBox(height: 30),
             TextButton(
               onPressed: controller.isMutating
@@ -121,7 +118,10 @@ class SettingsPage extends StatelessWidget {
                   : () => _confirmReset(context),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
-                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 0,
+                  vertical: 12,
+                ),
               ),
               child: Text(l10n.resetData),
             ),
@@ -214,10 +214,8 @@ class SettingsPage extends StatelessWidget {
                         label: l10n.secondQuantityLabel,
                         value: l10n.tabletsAmount(secondCount),
                         canDecrease: secondCount > 1,
-                        onDecrease: () =>
-                            setSheetState(() => secondCount -= 1),
-                        onIncrease: () =>
-                            setSheetState(() => secondCount += 1),
+                        onDecrease: () => setSheetState(() => secondCount -= 1),
+                        onIncrease: () => setSheetState(() => secondCount += 1),
                       ),
                       const Divider(height: 26),
                       _EditorStepper(
@@ -334,9 +332,9 @@ class SettingsPage extends StatelessWidget {
         if (!context.mounted) {
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.notificationUnavailable)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.notificationUnavailable)));
       }
       return;
     }
@@ -348,9 +346,9 @@ class SettingsPage extends StatelessWidget {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.notificationUnavailable)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.notificationUnavailable)));
     }
   }
 
@@ -430,10 +428,7 @@ class _SectionTitle extends StatelessWidget {
 }
 
 class _SettingsRow extends StatelessWidget {
-  const _SettingsRow({
-    required this.title,
-    required this.value,
-  });
+  const _SettingsRow({required this.title, required this.value});
 
   final String title;
   final String value;
@@ -495,10 +490,7 @@ class _ReminderRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 18),
-          Switch.adaptive(
-            value: value,
-            onChanged: enabled ? onChanged : null,
-          ),
+          Switch.adaptive(value: value, onChanged: enabled ? onChanged : null),
         ],
       ),
     );
@@ -530,9 +522,7 @@ class _LanguageRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           child: Row(
             children: [
-              Expanded(
-                child: Text(label, style: theme.textTheme.bodyLarge),
-              ),
+              Expanded(child: Text(label, style: theme.textTheme.bodyLarge)),
               if (selected)
                 Icon(
                   Icons.check_rounded,
@@ -548,10 +538,7 @@ class _LanguageRow extends StatelessWidget {
 }
 
 class _InformationBlock extends StatelessWidget {
-  const _InformationBlock({
-    required this.title,
-    required this.body,
-  });
+  const _InformationBlock({required this.title, required this.body});
 
   final String title;
   final String body;

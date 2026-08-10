@@ -9,18 +9,16 @@ import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class HistoryPage extends StatelessWidget {
-  const HistoryPage({
-    super.key,
-    required this.controller,
-  });
+  const HistoryPage({super.key, required this.controller});
 
   final DoseCheckController controller;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final keys = controller.events.map((event) => event.localDayKey).toSet().toList()
-      ..sort((a, b) => b.compareTo(a));
+    final keys =
+        controller.events.map((event) => event.localDayKey).toSet().toList()
+          ..sort((a, b) => b.compareTo(a));
 
     return ContentFrame(
       child: Column(
@@ -67,14 +65,14 @@ class HistoryPage extends StatelessWidget {
             final state = controller.stateForDay(day);
             final material = MaterialLocalizations.of(context);
             final dayKey = localDayKeyFor(day);
-            final dayEvents = controller.events
-                .where((event) => event.localDayKey == dayKey)
-                .toList()
-              ..sort(
-                (a, b) => a.occurredAtUtc.compareTo(b.occurredAtUtc),
-              );
-            final hasCorrections =
-                dayEvents.any((event) => event.type == DoseEventType.cleared);
+            final dayEvents =
+                controller.events
+                    .where((event) => event.localDayKey == dayKey)
+                    .toList()
+                  ..sort((a, b) => a.occurredAtUtc.compareTo(b.occurredAtUtc));
+            final hasCorrections = dayEvents.any(
+              (event) => event.type == DoseEventType.cleared,
+            );
 
             return SafeArea(
               top: false,
@@ -108,10 +106,10 @@ class HistoryPage extends StatelessWidget {
                         isBusy: controller.isMutating,
                         onCorrect: state.morning.isResolved
                             ? () => _confirmCorrection(
-                                  sheetContext,
-                                  day,
-                                  DoseSlot.morningPills,
-                                )
+                                sheetContext,
+                                day,
+                                DoseSlot.morningPills,
+                              )
                             : null,
                       ),
                       const Divider(),
@@ -126,10 +124,10 @@ class HistoryPage extends StatelessWidget {
                         isBusy: controller.isMutating,
                         onCorrect: state.second.isResolved
                             ? () => _confirmCorrection(
-                                  sheetContext,
-                                  day,
-                                  DoseSlot.secondPills,
-                                )
+                                sheetContext,
+                                day,
+                                DoseSlot.secondPills,
+                              )
                             : null,
                       ),
                       const Divider(),
@@ -144,10 +142,10 @@ class HistoryPage extends StatelessWidget {
                         isBusy: controller.isMutating,
                         onCorrect: state.night.isResolved
                             ? () => _confirmCorrection(
-                                  sheetContext,
-                                  day,
-                                  DoseSlot.nightInsulin,
-                                )
+                                sheetContext,
+                                day,
+                                DoseSlot.nightInsulin,
+                              )
                             : null,
                       ),
                       if (hasCorrections) ...[
@@ -210,16 +208,16 @@ class HistoryPage extends StatelessWidget {
       if (!context.mounted || result != DoseMutationResult.saved) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.statusUpdated)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.statusUpdated)));
     } catch (_) {
       if (!context.mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.localDataErrorTitle)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.localDataErrorTitle)));
     }
   }
 }
@@ -426,10 +424,7 @@ class _EmptyHistory extends StatelessWidget {
 }
 
 class _MiniStatus extends StatelessWidget {
-  const _MiniStatus({
-    required this.resolution,
-    this.size = 16,
-  });
+  const _MiniStatus({required this.resolution, this.size = 16});
 
   final DoseResolution resolution;
   final double size;
@@ -439,9 +434,10 @@ class _MiniStatus extends StatelessWidget {
     final theme = Theme.of(context);
     final color = switch (resolution) {
       DoseResolution.taken => theme.colorScheme.primary,
-      DoseResolution.uncertain => theme.brightness == Brightness.light
-          ? AppColors.amber
-          : const Color(0xFFE0B56D),
+      DoseResolution.uncertain =>
+        theme.brightness == Brightness.light
+            ? AppColors.amber
+            : const Color(0xFFE0B56D),
       DoseResolution.missed => theme.colorScheme.error,
       DoseResolution.pending => theme.colorScheme.outline,
     };
@@ -460,10 +456,10 @@ class _MiniStatus extends StatelessWidget {
       child: resolution == DoseResolution.taken
           ? Icon(Icons.check_rounded, size: size * 0.68, color: color)
           : resolution == DoseResolution.uncertain
-              ? Icon(Icons.question_mark_rounded, size: size * 0.62, color: color)
-              : resolution == DoseResolution.missed
-                  ? Icon(Icons.remove_rounded, size: size * 0.68, color: color)
-                  : null,
+          ? Icon(Icons.question_mark_rounded, size: size * 0.62, color: color)
+          : resolution == DoseResolution.missed
+          ? Icon(Icons.remove_rounded, size: size * 0.68, color: color)
+          : null,
     );
   }
 }
@@ -515,8 +511,8 @@ String? _historicalAmount(
   final amount = state.event!.amount!;
   final l10n = AppLocalizations.of(context);
   return switch (slot) {
-    DoseSlot.morningPills || DoseSlot.secondPills =>
-      l10n.tabletsAmount(amount.round()),
+    DoseSlot.morningPills ||
+    DoseSlot.secondPills => l10n.tabletsAmount(amount.round()),
     DoseSlot.nightInsulin => l10n.insulinUnits(amount),
   };
 }
@@ -546,8 +542,8 @@ String? _eventAmount(BuildContext context, DoseEvent event) {
 
   final l10n = AppLocalizations.of(context);
   return switch (event.slot) {
-    DoseSlot.morningPills || DoseSlot.secondPills =>
-      l10n.tabletsAmount(amount.round()),
+    DoseSlot.morningPills ||
+    DoseSlot.secondPills => l10n.tabletsAmount(amount.round()),
     DoseSlot.nightInsulin => l10n.insulinUnits(amount),
   };
 }

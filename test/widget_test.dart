@@ -8,7 +8,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'support/in_memory_repositories.dart';
 
 void main() {
-  testWidgets('DoseCheck exposes its three primary destinations', (tester) async {
+  testWidgets('DoseCheck exposes its three primary destinations', (
+    tester,
+  ) async {
     final controller = await DoseCheckController.load(
       doseRepository: InMemoryDoseRepository(),
       settingsRepository: InMemorySettingsRepository(),
