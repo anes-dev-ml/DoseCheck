@@ -519,7 +519,6 @@ class _DoseTimelineEntry extends StatelessWidget {
                           width: 52,
                           height: 52,
                           fit: BoxFit.contain,
-                          filterQuality: FilterQuality.medium,
                         ),
                       ),
                     ],
