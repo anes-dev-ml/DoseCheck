@@ -31,19 +31,63 @@ jobs:
       - name: Generate localizations
         run: flutter gen-l10n
 
-      - name: Apply recommended fixes
-        run: dart fix --apply
+      - name: Apply reviewed async context fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('lib/features/settings/presentation/settings_page.dart')
+          source = path.read_text()
+
+          before = "    final l10n = AppLocalizations.of(context);\n\n    if (enabled) {"
+          after = (
+              "    final l10n = AppLocalizations.of(context);\n"
+              "    final reminderMessages = _reminderMessages(l10n);\n\n"
+              "    if (enabled) {"
+          )
+          if before not in source:
+              raise SystemExit('Could not find reminder localization insertion point')
+          source = source.replace(before, after, 1)
+
+          before = "          messages: _reminderMessages(AppLocalizations.of(context)),"
+          after = "          messages: reminderMessages,"
+          if before not in source:
+              raise SystemExit('Could not find reminder message async-context use')
+          source = source.replace(before, after, 1)
+
+          before = (
+              "    } catch (_) {\n"
+              "      _showLocalFailure(context);\n"
+              "    }\n"
+              "  }\n\n"
+              "  Future<void> _confirmReset"
+          )
+          after = (
+              "    } catch (_) {\n"
+              "      if (!context.mounted) {\n"
+              "        return;\n"
+              "      }\n"
+              "      _showLocalFailure(context);\n"
+              "    }\n"
+              "  }\n\n"
+              "  Future<void> _confirmReset"
+          )
+          if before not in source:
+              raise SystemExit('Could not find language failure handler')
+          source = source.replace(before, after, 1)
+
+          path.write_text(source)
 
       - name: Apply formatting
         run: dart format lib test
 
-      - name: Commit mechanical fixes
+      - name: Commit reviewed fixes
         run: |
           if ! git diff --quiet -- lib test; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add lib test
-            git commit -m "Apply Dart analyzer fixes"
+            git commit -m "Guard Settings async context usage"
             git push origin HEAD:${{ github.event.pull_request.head.ref }}
           fi
 
