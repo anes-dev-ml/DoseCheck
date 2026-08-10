@@ -1,5 +1,5 @@
 import 'package:dosecheck/app/app.dart';
-import 'package:dosecheck/app/app_controller.dart';
+import 'package:dosecheck/app/app_runtime.dart';
 import 'package:dosecheck/app/bootstrap.dart';
 import 'package:dosecheck/core/design/app_theme.dart';
 import 'package:dosecheck/core/design/dosecheck_mark.dart';
@@ -14,7 +14,7 @@ class DoseCheckBootstrapGate extends StatefulWidget {
 }
 
 class _DoseCheckBootstrapGateState extends State<DoseCheckBootstrapGate> {
-  late Future<DoseCheckController> _bootstrapFuture;
+  late Future<DoseCheckRuntime> _bootstrapFuture;
 
   @override
   void initState() {
@@ -30,11 +30,11 @@ class _DoseCheckBootstrapGateState extends State<DoseCheckBootstrapGate> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DoseCheckController>(
+    return FutureBuilder<DoseCheckRuntime>(
       future: _bootstrapFuture,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return DoseCheckApp(controller: snapshot.requireData);
+          return DoseCheckApp(runtime: snapshot.requireData);
         }
 
         return _BootstrapMaterialApp(
