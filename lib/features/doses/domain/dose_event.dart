@@ -20,14 +20,14 @@ enum DoseEventType {
 }
 
 class DoseEvent {
-  const DoseEvent({
+  const DoseEvent._({
     required this.id,
     required this.localDayKey,
     required this.slot,
     required this.type,
     required this.occurredAtUtc,
     this.amount,
-  }) : assert(occurredAtUtc.isUtc);
+  });
 
   static const int schemaVersion = 1;
 
@@ -44,8 +44,10 @@ class DoseEvent {
     required DateTime occurredAt,
     double? amount,
   }) {
+    _validateAmount(slot: slot, type: type, amount: amount);
+
     final utc = occurredAt.toUtc();
-    return DoseEvent(
+    return DoseEvent._(
       id: '${slot.storageKey}-${utc.microsecondsSinceEpoch}-${type.storageKey}',
       localDayKey: localDayKeyFor(occurredAt),
       slot: slot,
@@ -68,22 +70,22 @@ class DoseEvent {
   }
 
   factory DoseEvent.fromMap(Map<String, dynamic> map) {
-    final version = map['schema_version'] as int? ?? 1;
-    if (version != schemaVersion) {
-      throw FormatException('Unsupported dose event schema version: $version');
+    final rawVersion = map['schema_version'] ?? 1;
+    if (rawVersion is! int || rawVersion != schemaVersion) {
+      throw FormatException('Unsupported dose event schema version: $rawVersion');
     }
 
     final id = map['id'];
     final day = map['local_day_key'];
-    final slot = map['slot'];
-    final type = map['type'];
+    final slotValue = map['slot'];
+    final typeValue = map['type'];
     final occurredAt = map['occurred_at_utc'];
-    final amount = map['amount'];
+    final rawAmount = map['amount'];
 
     if (id is! String ||
         day is! String ||
-        slot is! String ||
-        type is! String ||
+        slotValue is! String ||
+        typeValue is! String ||
         occurredAt is! String) {
       throw const FormatException('Invalid dose event payload');
     }
@@ -93,18 +95,54 @@ class DoseEvent {
       throw const FormatException('Invalid dose event timestamp');
     }
 
-    if (amount != null && amount is! num) {
+    if (rawAmount != null && rawAmount is! num) {
       throw const FormatException('Invalid dose event amount');
     }
 
-    return DoseEvent(
+    final slot = DoseSlot.fromStorage(slotValue);
+    final type = DoseEventType.fromStorage(typeValue);
+    final amount = (rawAmount as num?)?.toDouble();
+
+    try {
+      _validateAmount(slot: slot, type: type, amount: amount);
+    } on ArgumentError catch (error) {
+      throw FormatException('Invalid dose event amount: ${error.message}');
+    }
+
+    return DoseEvent._(
       id: id,
       localDayKey: day,
-      slot: DoseSlot.fromStorage(slot),
-      type: DoseEventType.fromStorage(type),
+      slot: slot,
+      type: type,
       occurredAtUtc: parsedTime.toUtc(),
-      amount: (amount as num?)?.toDouble(),
+      amount: amount,
     );
+  }
+
+  static void _validateAmount({
+    required DoseSlot slot,
+    required DoseEventType type,
+    required double? amount,
+  }) {
+    if (amount == null) {
+      return;
+    }
+
+    if (slot != DoseSlot.nightInsulin || type != DoseEventType.taken) {
+      throw ArgumentError.value(
+        amount,
+        'amount',
+        'An amount is only stored for a taken night-insulin event.',
+      );
+    }
+
+    if (!amount.isFinite || amount <= 0) {
+      throw ArgumentError.value(
+        amount,
+        'amount',
+        'Must be a positive finite number.',
+      );
+    }
   }
 
   @override
