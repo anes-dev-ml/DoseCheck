@@ -97,6 +97,7 @@ class LocalReminderService implements ReminderService {
       minutesOfDay: regimen.morningTimeMinutes,
       reference: reference,
       details: details,
+      startTomorrow: today.morning.isResolved,
     );
     await _scheduleDaily(
       id: _nightId,
@@ -105,6 +106,7 @@ class LocalReminderService implements ReminderService {
       minutesOfDay: regimen.nightTimeMinutes,
       reference: reference,
       details: details,
+      startTomorrow: today.night.isResolved,
     );
 
     final availableAt = today.second.availableAt;
@@ -140,16 +142,19 @@ class LocalReminderService implements ReminderService {
     required int minutesOfDay,
     required tz.TZDateTime reference,
     required NotificationDetails details,
+    required bool startTomorrow,
   }) async {
+    final initialDayOffset = startTomorrow ? 1 : 0;
     var scheduled = tz.TZDateTime(
       tz.local,
       reference.year,
       reference.month,
-      reference.day,
+      reference.day + initialDayOffset,
       minutesOfDay ~/ 60,
       minutesOfDay % 60,
     );
-    if (!scheduled.isAfter(reference)) {
+
+    if (!startTomorrow && !scheduled.isAfter(reference)) {
       scheduled = tz.TZDateTime(
         tz.local,
         reference.year,
