@@ -1,4 +1,5 @@
 import 'package:dosecheck/app/app_controller.dart';
+import 'package:dosecheck/core/design/app_assets.dart';
 import 'package:dosecheck/features/history/presentation/history_page.dart';
 import 'package:dosecheck/features/reminders/application/reminder_service.dart';
 import 'package:dosecheck/features/settings/presentation/settings_page.dart';
@@ -44,21 +45,58 @@ class _AppShellState extends State<AppShell> {
         onDestinationSelected: (index) => setState(() => _index = index),
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.today_outlined),
-            selectedIcon: const Icon(Icons.today_rounded),
+            icon: const _NavigationAssetIcon(asset: AppAssets.navToday),
+            selectedIcon: const _NavigationAssetIcon(
+              asset: AppAssets.navToday,
+              selected: true,
+            ),
             label: l10n.navToday,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.history_outlined),
-            selectedIcon: const Icon(Icons.history_rounded),
+            icon: const _NavigationAssetIcon(asset: AppAssets.navHistory),
+            selectedIcon: const _NavigationAssetIcon(
+              asset: AppAssets.navHistory,
+              selected: true,
+            ),
             label: l10n.navHistory,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.tune_outlined),
-            selectedIcon: const Icon(Icons.tune_rounded),
+            icon: const _NavigationAssetIcon(asset: AppAssets.navSettings),
+            selectedIcon: const _NavigationAssetIcon(
+              asset: AppAssets.navSettings,
+              selected: true,
+            ),
             label: l10n.navSettings,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NavigationAssetIcon extends StatelessWidget {
+  const _NavigationAssetIcon({required this.asset, this.selected = false});
+
+  final String asset;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: selected ? 1 : 0.62,
+      duration: const Duration(milliseconds: 160),
+      child: AnimatedScale(
+        scale: selected ? 1.08 : 1,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+        child: Image.asset(
+          asset,
+          width: 25,
+          height: 25,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.medium,
+          excludeFromSemantics: true,
+        ),
       ),
     );
   }
