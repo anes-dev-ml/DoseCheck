@@ -35,7 +35,7 @@ The interface ships in English, French, and Arabic. Arabic uses RTL layout from 
 lib/
   app/                         # bootstrap, runtime dependencies, app shell
   core/
-    design/                    # visual tokens and DoseCheck mark
+    design/                    # visual tokens, asset paths, DoseCheck mark
     time/                      # local calendar helpers
     widgets/                   # shared layout primitives
   features/
@@ -76,6 +76,27 @@ Local notifications are supported on Android and iOS in this version.
 - Web and desktop builds remain useful for UI development and local records but do not schedule medication notifications.
 
 Notifications are assistive. The record inside DoseCheck remains the source of truth.
+
+## Visual assets
+
+Original artwork is kept in `assets/source/`. Flutter never bundles that folder directly.
+
+Runtime artwork is intentionally smaller:
+
+- `assets/branding/` — the in-app DoseCheck mark.
+- `assets/icons/` — navigation and medication artwork sized for the UI.
+- platform launcher/icon resources — generated into Android, iOS, macOS, web, and Windows resource folders.
+
+Asset paths used by Dart live in `lib/core/design/app_assets.dart` so presentation code does not repeat file-name strings.
+
+If source artwork is replaced, regenerate the normalized and platform-specific files from the repository root with:
+
+```bash
+python -m pip install pillow==11.3.0
+python tool/prepare_assets.py
+```
+
+The runtime asset test verifies that every image referenced by the Flutter UI is packaged and non-empty.
 
 ## Run locally
 
