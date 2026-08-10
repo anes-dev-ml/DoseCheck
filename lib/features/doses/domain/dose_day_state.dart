@@ -48,9 +48,12 @@ class DoseDayState {
       slots.where((state) => state.resolution == DoseResolution.taken).length;
   bool get hasUncertainty =>
       slots.any((state) => state.resolution == DoseResolution.uncertain);
+  bool get hasMissed =>
+      slots.any((state) => state.resolution == DoseResolution.missed);
   bool get hasPending =>
       slots.any((state) => state.resolution == DoseResolution.pending);
   bool get allResolved => !hasPending;
+  bool get allTaken => takenCount == slots.length;
 
   DoseSlotState stateFor(DoseSlot slot) {
     return switch (slot) {
