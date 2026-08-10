@@ -20,6 +20,8 @@ abstract final class AppColors {
   static const darkLine = Color(0xFF313B34);
   static const darkAccent = Color(0xFF8FC7A8);
   static const darkAccentSoft = Color(0xFF263E31);
+  static const darkDanger = Color(0xFFF0A5A5);
+  static const darkDangerSoft = Color(0xFF402525);
 }
 
 abstract final class AppTheme {
@@ -32,6 +34,8 @@ abstract final class AppTheme {
         line: AppColors.line,
         accent: AppColors.accent,
         accentSoft: AppColors.accentSoft,
+        danger: AppColors.danger,
+        dangerSoft: AppColors.dangerSoft,
       );
 
   static ThemeData get dark => _build(
@@ -43,6 +47,8 @@ abstract final class AppTheme {
         line: AppColors.darkLine,
         accent: AppColors.darkAccent,
         accentSoft: AppColors.darkAccentSoft,
+        danger: AppColors.darkDanger,
+        dangerSoft: AppColors.darkDangerSoft,
       );
 
   static ThemeData _build({
@@ -54,23 +60,25 @@ abstract final class AppTheme {
     required Color line,
     required Color accent,
     required Color accentSoft,
+    required Color danger,
+    required Color dangerSoft,
   }) {
+    final isLight = brightness == Brightness.light;
     final colorScheme = ColorScheme(
       brightness: brightness,
       primary: accent,
-      onPrimary: brightness == Brightness.light ? Colors.white : AppColors.ink,
+      onPrimary: isLight ? Colors.white : AppColors.ink,
       primaryContainer: accentSoft,
       onPrimaryContainer: ink,
       secondary: mutedInk,
       onSecondary: surface,
-      secondaryContainer: brightness == Brightness.light
-          ? const Color(0xFFE7EAE6)
-          : const Color(0xFF29312C),
+      secondaryContainer:
+          isLight ? const Color(0xFFE7EAE6) : const Color(0xFF29312C),
       onSecondaryContainer: ink,
-      error: AppColors.danger,
-      onError: Colors.white,
-      errorContainer: AppColors.dangerSoft,
-      onErrorContainer: AppColors.danger,
+      error: danger,
+      onError: isLight ? Colors.white : AppColors.ink,
+      errorContainer: dangerSoft,
+      onErrorContainer: danger,
       surface: surface,
       onSurface: ink,
       outline: line,
@@ -152,7 +160,6 @@ abstract final class AppTheme {
       canvasColor: canvas,
       textTheme: textTheme,
       dividerColor: line,
-      splashFactory: InkSparkle.splashFactory,
       appBarTheme: AppBarTheme(
         backgroundColor: canvas,
         foregroundColor: ink,
