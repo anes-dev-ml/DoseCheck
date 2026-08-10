@@ -127,26 +127,35 @@ class DoseEvent {
     required DoseEventType type,
     required double? amount,
   }) {
-    final isTakenInsulin =
-        slot == DoseSlot.nightInsulin && type == DoseEventType.taken;
-
-    if (isTakenInsulin && amount == null) {
+    if (type == DoseEventType.taken && amount == null) {
       throw ArgumentError.notNull('amount');
     }
 
-    if (!isTakenInsulin && amount != null) {
+    if (type != DoseEventType.taken && amount != null) {
       throw ArgumentError.value(
         amount,
         'amount',
-        'An amount is only stored for a taken night-insulin event.',
+        'Only a taken event may store an amount.',
       );
     }
 
-    if (amount != null && (!amount.isFinite || amount <= 0)) {
+    if (amount == null) {
+      return;
+    }
+
+    if (!amount.isFinite || amount <= 0) {
       throw ArgumentError.value(
         amount,
         'amount',
         'Must be a positive finite number.',
+      );
+    }
+
+    if (slot != DoseSlot.nightInsulin && amount != amount.roundToDouble()) {
+      throw ArgumentError.value(
+        amount,
+        'amount',
+        'Tablet amounts must be whole numbers.',
       );
     }
   }
