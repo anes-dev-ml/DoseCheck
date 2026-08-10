@@ -58,14 +58,26 @@ class _ReminderCoordinatorState extends State<ReminderCoordinator> {
   }
 
   void _queueSync() {
-    if (!mounted || _syncQueued) {
+    if (!mounted) {
+      return;
+    }
+
+    if (widget.controller.isMutating) {
+      _lastFingerprint = null;
+      return;
+    }
+
+    if (_syncQueued) {
       return;
     }
 
     _syncQueued = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _syncQueued = false;
-      if (!mounted) {
+      if (!mounted || widget.controller.isMutating) {
+        if (mounted) {
+          _lastFingerprint = null;
+        }
         return;
       }
       await _syncIfNeeded();
