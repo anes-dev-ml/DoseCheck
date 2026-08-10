@@ -196,8 +196,24 @@ class DoseCheckController extends ChangeNotifier {
       _events = [];
       _regimen = const RegimenPlan.initial();
       _preferences = const AppPreferences.initial();
+    } catch (_) {
+      await _bestEffortReload();
+      rethrow;
     } finally {
       _setMutating(false);
+    }
+  }
+
+  Future<void> _bestEffortReload() async {
+    try {
+      final events = await _doseRepository.readAll();
+      final regimen = await _settingsRepository.readRegimen();
+      final preferences = await _settingsRepository.readPreferences();
+      _events = List.of(events);
+      _regimen = regimen;
+      _preferences = preferences;
+    } catch (_) {
+      // The original storage error remains the useful failure for the caller.
     }
   }
 
