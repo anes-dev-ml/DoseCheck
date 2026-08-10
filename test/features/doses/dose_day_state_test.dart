@@ -15,11 +15,15 @@ void main() {
     int minute = 0,
     double? amount,
   }) {
+    final recordedAmount = type == DoseEventType.taken
+        ? amount ?? (slot == DoseSlot.nightInsulin ? 8 : 2)
+        : null;
+
     return DoseEvent.create(
       slot: slot,
       type: type,
       occurredAt: DateTime(2026, 8, 10, hour, minute),
-      amount: amount,
+      amount: recordedAmount,
     );
   }
 
@@ -40,7 +44,12 @@ void main() {
     });
 
     test('unlocks the second entry only after the configured interval', () {
-      final morning = event(DoseSlot.morningPills, DoseEventType.taken, 9, minute: 17);
+      final morning = event(
+        DoseSlot.morningPills,
+        DoseEventType.taken,
+        9,
+        minute: 17,
+      );
 
       final before = DoseDayState.derive(
         plan: plan,
