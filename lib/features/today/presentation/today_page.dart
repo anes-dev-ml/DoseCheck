@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dosecheck/app/app_controller.dart';
+import 'package:dosecheck/core/design/app_assets.dart';
 import 'package:dosecheck/core/design/app_theme.dart';
 import 'package:dosecheck/core/design/dosecheck_mark.dart';
 import 'package:dosecheck/core/widgets/content_frame.dart';
@@ -68,6 +69,7 @@ class _TodayPageState extends State<TodayPage> {
             const SizedBox(height: 36),
             _DoseTimelineEntry(
               state: state.morning,
+              artworkAsset: AppAssets.dosePills,
               title: l10n.morningPills,
               amount: _amountFor(context, state.morning, DoseSlot.morningPills),
               detail: _detailFor(context, state.morning, DoseSlot.morningPills),
@@ -78,6 +80,7 @@ class _TodayPageState extends State<TodayPage> {
             ),
             _DoseTimelineEntry(
               state: state.second,
+              artworkAsset: AppAssets.dosePills,
               title: l10n.secondPills,
               amount: _amountFor(context, state.second, DoseSlot.secondPills),
               detail: _detailFor(context, state.second, DoseSlot.secondPills),
@@ -88,6 +91,7 @@ class _TodayPageState extends State<TodayPage> {
             ),
             _DoseTimelineEntry(
               state: state.night,
+              artworkAsset: AppAssets.doseInsulinNight,
               title: l10n.nightInsulin,
               amount: _amountFor(context, state.night, DoseSlot.nightInsulin),
               detail: _detailFor(context, state.night, DoseSlot.nightInsulin),
@@ -442,6 +446,7 @@ class _DaySummary extends StatelessWidget {
 class _DoseTimelineEntry extends StatelessWidget {
   const _DoseTimelineEntry({
     required this.state,
+    required this.artworkAsset,
     required this.title,
     required this.amount,
     required this.detail,
@@ -452,6 +457,7 @@ class _DoseTimelineEntry extends StatelessWidget {
   });
 
   final DoseSlotState state;
+  final String artworkAsset;
   final String title;
   final String amount;
   final String detail;
@@ -493,9 +499,31 @@ class _DoseTimelineEntry extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 3),
-                  Text(amount, style: theme.textTheme.bodyLarge),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(title, style: theme.textTheme.titleMedium),
+                            const SizedBox(height: 3),
+                            Text(amount, style: theme.textTheme.bodyLarge),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ExcludeSemantics(
+                        child: Image.asset(
+                          artworkAsset,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.contain,
+                          filterQuality: FilterQuality.medium,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 3),
                   Text(detail, style: theme.textTheme.bodyMedium),
                   if (!state.isResolved && !state.isActionLocked) ...[
