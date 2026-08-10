@@ -94,7 +94,6 @@ class _NavigationAssetIcon extends StatelessWidget {
           width: 25,
           height: 25,
           fit: BoxFit.contain,
-          filterQuality: FilterQuality.medium,
           excludeFromSemantics: true,
         ),
       ),
