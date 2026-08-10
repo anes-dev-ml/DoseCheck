@@ -8,16 +8,13 @@ class DoseCheckMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: 'DoseCheck',
-      image: true,
-      child: Image.asset(
-        AppAssets.brandMark,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        filterQuality: FilterQuality.medium,
-      ),
+    return Image.asset(
+      AppAssets.brandMark,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+      excludeFromSemantics: true,
     );
   }
 }
