@@ -46,6 +46,7 @@ void main() {
         controller.stateForDay(now, now: now).morning.resolution,
         DoseResolution.taken,
       );
+      expect(repository.events.single.amount, 2);
     });
 
     test('rapid duplicate logging cannot create a second event', () async {
@@ -129,6 +130,7 @@ void main() {
         slot: DoseSlot.morningPills,
         type: DoseEventType.taken,
         occurredAt: DateTime(2026, 8, 9, 8),
+        amount: 2,
       );
       final repository = InMemoryDoseRepository(initialEvents: [original]);
       final controller = await createController(doseRepository: repository);
