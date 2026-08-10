@@ -46,7 +46,7 @@ class _TodayPageState extends State<TodayPage> {
           children: [
             Row(
               children: [
-                const DoseCheckMark(size: 28),
+                const DoseCheckMark(size: 31),
                 const SizedBox(width: 10),
                 Text(
                   l10n.appName,
@@ -54,7 +54,7 @@ class _TodayPageState extends State<TodayPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 38),
+            const SizedBox(height: 32),
             Text(
               l10n.todayGreeting,
               style: Theme.of(context).textTheme.headlineMedium,
@@ -66,7 +66,7 @@ class _TodayPageState extends State<TodayPage> {
             ),
             const SizedBox(height: 24),
             _DaySummary(state: state, l10n: l10n),
-            const SizedBox(height: 36),
+            const SizedBox(height: 26),
             _DoseTimelineEntry(
               state: state.morning,
               artworkAsset: AppAssets.dosePills,
@@ -495,7 +495,7 @@ class _DoseTimelineEntry extends StatelessWidget {
           const SizedBox(width: 15),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 8 : 31),
+              padding: EdgeInsets.only(bottom: isLast ? 8 : 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -512,13 +512,16 @@ class _DoseTimelineEntry extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       ExcludeSemantics(
-                        child: Image.asset(
-                          artworkAsset,
-                          width: 52,
-                          height: 52,
-                          fit: BoxFit.contain,
+                        child: Opacity(
+                          opacity: theme.brightness == Brightness.dark ? 0.78 : 0.88,
+                          child: Image.asset(
+                            artworkAsset,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ],
