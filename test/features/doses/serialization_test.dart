@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('RegimenPlan serialization', () {
     test('round-trips the configured routine', () {
-      const plan = RegimenPlan(
+      final plan = RegimenPlan(
         morningTabletCount: 2,
         morningTimeMinutes: 7 * 60 + 45,
         secondTabletCount: 2,
@@ -20,6 +20,20 @@ void main() {
       );
 
       expect(restored, plan);
+    });
+
+    test('rejects an invalid schedule at runtime', () {
+      expect(
+        () => RegimenPlan(
+          morningTabletCount: 2,
+          morningTimeMinutes: -1,
+          secondTabletCount: 2,
+          secondMinimumIntervalMinutes: 360,
+          nightInsulinUnits: 8,
+          nightTimeMinutes: 22 * 60,
+        ),
+        throwsArgumentError,
+      );
     });
   });
 
