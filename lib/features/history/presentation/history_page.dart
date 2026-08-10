@@ -3,6 +3,7 @@ import 'package:dosecheck/core/design/app_theme.dart';
 import 'package:dosecheck/core/time/local_day.dart';
 import 'package:dosecheck/core/widgets/content_frame.dart';
 import 'package:dosecheck/features/doses/domain/dose_day_state.dart';
+import 'package:dosecheck/features/doses/domain/dose_event.dart';
 import 'package:dosecheck/features/doses/domain/dose_slot.dart';
 import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +66,15 @@ class HistoryPage extends StatelessWidget {
             final l10n = AppLocalizations.of(context);
             final state = controller.stateForDay(day);
             final material = MaterialLocalizations.of(context);
+            final dayKey = localDayKeyFor(day);
+            final dayEvents = controller.events
+                .where((event) => event.localDayKey == dayKey)
+                .toList()
+              ..sort(
+                (a, b) => a.occurredAtUtc.compareTo(b.occurredAtUtc),
+              );
+            final hasCorrections =
+                dayEvents.any((event) => event.type == DoseEventType.cleared);
 
             return SafeArea(
               top: false,
@@ -89,8 +99,10 @@ class HistoryPage extends StatelessWidget {
                       const SizedBox(height: 26),
                       _HistoryDoseDetail(
                         title: l10n.morningPills,
-                        amount: l10n.tabletsAmount(
-                          controller.regimen.morningTabletCount,
+                        amount: _historicalAmount(
+                          context,
+                          state.morning,
+                          DoseSlot.morningPills,
                         ),
                         state: state.morning,
                         isBusy: controller.isMutating,
@@ -105,8 +117,10 @@ class HistoryPage extends StatelessWidget {
                       const Divider(),
                       _HistoryDoseDetail(
                         title: l10n.secondPills,
-                        amount: l10n.tabletsAmount(
-                          controller.regimen.secondTabletCount,
+                        amount: _historicalAmount(
+                          context,
+                          state.second,
+                          DoseSlot.secondPills,
                         ),
                         state: state.second,
                         isBusy: controller.isMutating,
@@ -121,9 +135,10 @@ class HistoryPage extends StatelessWidget {
                       const Divider(),
                       _HistoryDoseDetail(
                         title: l10n.nightInsulin,
-                        amount: l10n.insulinUnits(
-                          state.night.event?.amount ??
-                              controller.regimen.nightInsulinUnits,
+                        amount: _historicalAmount(
+                          context,
+                          state.night,
+                          DoseSlot.nightInsulin,
                         ),
                         state: state.night,
                         isBusy: controller.isMutating,
@@ -135,6 +150,22 @@ class HistoryPage extends StatelessWidget {
                                 )
                             : null,
                       ),
+                      if (hasCorrections) ...[
+                        const SizedBox(height: 20),
+                        Container(
+                          width: 38,
+                          height: 2,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(height: 18),
+                        Text(
+                          l10n.dayDetailsTitle,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        for (final event in dayEvents)
+                          _AuditEventRow(event: event),
+                      ],
                     ],
                   ),
                 ),
@@ -187,7 +218,7 @@ class HistoryPage extends StatelessWidget {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.localDataErrorBody)),
+        SnackBar(content: Text(l10n.localDataErrorTitle)),
       );
     }
   }
@@ -260,7 +291,7 @@ class _HistoryDoseDetail extends StatelessWidget {
   });
 
   final String title;
-  final String amount;
+  final String? amount;
   final DoseSlotState state;
   final bool isBusy;
   final VoidCallback? onCorrect;
@@ -285,10 +316,15 @@ class _HistoryDoseDetail extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: theme.textTheme.titleMedium),
-                const SizedBox(height: 2),
-                Text(amount, style: theme.textTheme.bodyLarge),
+                if (amount != null) ...[
+                  const SizedBox(height: 2),
+                  Text(amount!, style: theme.textTheme.bodyLarge),
+                ],
                 const SizedBox(height: 3),
-                Text(_stateDetail(context, state), style: theme.textTheme.bodyMedium),
+                Text(
+                  _stateDetail(context, state),
+                  style: theme.textTheme.bodyMedium,
+                ),
                 if (onCorrect != null) ...[
                   const SizedBox(height: 8),
                   TextButton(
@@ -301,6 +337,52 @@ class _HistoryDoseDetail extends StatelessWidget {
                     child: Text(l10n.clearEntry),
                   ),
                 ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuditEventRow extends StatelessWidget {
+  const _AuditEventRow({required this.event});
+
+  final DoseEvent event;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final time = MaterialLocalizations.of(context).formatTimeOfDay(
+      TimeOfDay.fromDateTime(event.occurredAtUtc.toLocal()),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
+    final slotTitle = _slotTitle(l10n, event.slot);
+    final status = _eventStatusLabel(l10n, event.type);
+    final amount = _eventAmount(context, event);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 9),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 66,
+            child: Text(time, style: theme.textTheme.labelMedium),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(slotTitle, style: theme.textTheme.bodyLarge),
+                const SizedBox(height: 2),
+                Text(
+                  amount == null ? status : '$status · $amount',
+                  style: theme.textTheme.bodyMedium,
+                ),
               ],
             ),
           ),
@@ -418,5 +500,54 @@ String _stateDetail(BuildContext context, DoseSlotState state) {
     DoseResolution.missed => l10n.missedAt(time),
     DoseResolution.uncertain => l10n.uncertainAt(time),
     DoseResolution.pending => l10n.pending,
+  };
+}
+
+String? _historicalAmount(
+  BuildContext context,
+  DoseSlotState state,
+  DoseSlot slot,
+) {
+  if (state.resolution != DoseResolution.taken || state.event?.amount == null) {
+    return null;
+  }
+
+  final amount = state.event!.amount!;
+  final l10n = AppLocalizations.of(context);
+  return switch (slot) {
+    DoseSlot.morningPills || DoseSlot.secondPills =>
+      l10n.tabletsAmount(amount.round()),
+    DoseSlot.nightInsulin => l10n.insulinUnits(amount),
+  };
+}
+
+String _slotTitle(AppLocalizations l10n, DoseSlot slot) {
+  return switch (slot) {
+    DoseSlot.morningPills => l10n.morningPills,
+    DoseSlot.secondPills => l10n.secondPills,
+    DoseSlot.nightInsulin => l10n.nightInsulin,
+  };
+}
+
+String _eventStatusLabel(AppLocalizations l10n, DoseEventType type) {
+  return switch (type) {
+    DoseEventType.taken => l10n.taken,
+    DoseEventType.missed => l10n.missed,
+    DoseEventType.uncertain => l10n.uncertain,
+    DoseEventType.cleared => l10n.cleared,
+  };
+}
+
+String? _eventAmount(BuildContext context, DoseEvent event) {
+  final amount = event.amount;
+  if (amount == null) {
+    return null;
+  }
+
+  final l10n = AppLocalizations.of(context);
+  return switch (event.slot) {
+    DoseSlot.morningPills || DoseSlot.secondPills =>
+      l10n.tabletsAmount(amount.round()),
+    DoseSlot.nightInsulin => l10n.insulinUnits(amount),
   };
 }
