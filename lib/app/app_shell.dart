@@ -1,5 +1,6 @@
 import 'package:dosecheck/app/app_controller.dart';
 import 'package:dosecheck/features/history/presentation/history_page.dart';
+import 'package:dosecheck/features/reminders/application/reminder_service.dart';
 import 'package:dosecheck/features/settings/presentation/settings_page.dart';
 import 'package:dosecheck/features/today/presentation/today_page.dart';
 import 'package:dosecheck/l10n/generated/app_localizations.dart';
@@ -9,9 +10,11 @@ class AppShell extends StatefulWidget {
   const AppShell({
     super.key,
     required this.controller,
+    required this.reminders,
   });
 
   final DoseCheckController controller;
+  final ReminderService reminders;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -30,7 +33,10 @@ class _AppShellState extends State<AppShell> {
         children: [
           TodayPage(controller: widget.controller),
           HistoryPage(controller: widget.controller),
-          SettingsPage(controller: widget.controller),
+          SettingsPage(
+            controller: widget.controller,
+            reminders: widget.reminders,
+          ),
         ],
       ),
       bottomNavigationBar: NavigationBar(
