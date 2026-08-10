@@ -1,4 +1,4 @@
-String localDayKey(DateTime value) {
+String localDayKeyFor(DateTime value) {
   final local = value.toLocal();
   return '${local.year.toString().padLeft(4, '0')}-'
       '${local.month.toString().padLeft(2, '0')}-'
