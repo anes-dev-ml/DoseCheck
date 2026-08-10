@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate:
@@ -16,21 +16,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-
-      - name: Restore natural Today layout
-        run: python tool/revert_today_bottom_clearance.py
-
-      - name: Commit layout revert
-        run: |
-          if ! git diff --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add lib/features/today/presentation/today_page.dart
-            git commit -m "Restore natural Today layout"
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
-          fi
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
