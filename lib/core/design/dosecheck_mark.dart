@@ -13,7 +13,6 @@ class DoseCheckMark extends StatelessWidget {
       width: size,
       height: size,
       fit: BoxFit.contain,
-      filterQuality: FilterQuality.medium,
       excludeFromSemantics: true,
     );
   }
