@@ -296,6 +296,7 @@ class SettingsPage extends StatelessWidget {
     }
 
     final l10n = AppLocalizations.of(context);
+    final reminderMessages = _reminderMessages(l10n);
 
     if (enabled) {
       final granted = await reminders.requestPermission();
@@ -316,7 +317,7 @@ class SettingsPage extends StatelessWidget {
           enabled: true,
           regimen: controller.regimen,
           today: controller.stateForDay(now, now: now),
-          messages: _reminderMessages(AppLocalizations.of(context)),
+          messages: reminderMessages,
           now: now,
         );
       } catch (_) {
@@ -357,6 +358,9 @@ class SettingsPage extends StatelessWidget {
     try {
       await controller.updateLanguage(code);
     } catch (_) {
+      if (!context.mounted) {
+        return;
+      }
       _showLocalFailure(context);
     }
   }
