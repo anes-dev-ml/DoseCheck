@@ -41,6 +41,7 @@ class _AppShellState extends State<AppShell> {
         ],
       ),
       bottomNavigationBar: NavigationBar(
+        height: 88,
         selectedIndex: _index,
         onDestinationSelected: (index) => setState(() => _index = index),
         destinations: [
@@ -86,15 +87,15 @@ class _NavigationAssetIcon extends StatelessWidget {
     final color = selected ? colors.primary : colors.onSurfaceVariant;
 
     return AnimatedScale(
-      scale: selected ? 1.04 : 0.96,
+      scale: selected ? 1.06 : 1,
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOutCubic,
       child: ColorFiltered(
         colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         child: Image.asset(
           asset,
-          width: 24,
-          height: 24,
+          width: 29,
+          height: 29,
           fit: BoxFit.contain,
           excludeFromSemantics: true,
         ),
