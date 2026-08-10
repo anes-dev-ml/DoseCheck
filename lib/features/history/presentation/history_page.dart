@@ -1,9 +1,15 @@
+import 'package:dosecheck/app/app_controller.dart';
 import 'package:dosecheck/core/widgets/content_frame.dart';
 import 'package:dosecheck/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 class HistoryPage extends StatelessWidget {
-  const HistoryPage({super.key});
+  const HistoryPage({
+    super.key,
+    required this.controller,
+  });
+
+  final DoseCheckController controller;
 
   @override
   Widget build(BuildContext context) {
