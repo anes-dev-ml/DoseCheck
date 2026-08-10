@@ -40,6 +40,7 @@ class _TodayPageState extends State<TodayPage> {
     _scheduleNextRefresh(now, state);
 
     return ContentFrame(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 112),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
