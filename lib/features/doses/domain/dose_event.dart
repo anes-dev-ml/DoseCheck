@@ -42,6 +42,7 @@ class DoseEvent {
     required DoseSlot slot,
     required DoseEventType type,
     required DateTime occurredAt,
+    DateTime? forDay,
     double? amount,
   }) {
     _validateAmount(slot: slot, type: type, amount: amount);
@@ -49,7 +50,7 @@ class DoseEvent {
     final utc = occurredAt.toUtc();
     return DoseEvent._(
       id: '${slot.storageKey}-${utc.microsecondsSinceEpoch}-${type.storageKey}',
-      localDayKey: localDayKeyFor(occurredAt),
+      localDayKey: localDayKeyFor(forDay ?? occurredAt),
       slot: slot,
       type: type,
       occurredAtUtc: utc,
@@ -90,6 +91,8 @@ class DoseEvent {
       throw const FormatException('Invalid dose event payload');
     }
 
+    localDayFromKey(day);
+
     final parsedTime = DateTime.tryParse(occurredAt);
     if (parsedTime == null) {
       throw const FormatException('Invalid dose event timestamp');
@@ -124,11 +127,14 @@ class DoseEvent {
     required DoseEventType type,
     required double? amount,
   }) {
-    if (amount == null) {
-      return;
+    final isTakenInsulin =
+        slot == DoseSlot.nightInsulin && type == DoseEventType.taken;
+
+    if (isTakenInsulin && amount == null) {
+      throw ArgumentError.notNull('amount');
     }
 
-    if (slot != DoseSlot.nightInsulin || type != DoseEventType.taken) {
+    if (!isTakenInsulin && amount != null) {
       throw ArgumentError.value(
         amount,
         'amount',
@@ -136,7 +142,7 @@ class DoseEvent {
       );
     }
 
-    if (!amount.isFinite || amount <= 0) {
+    if (amount != null && (!amount.isFinite || amount <= 0)) {
       throw ArgumentError.value(
         amount,
         'amount',
