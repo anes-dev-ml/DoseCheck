@@ -47,7 +47,7 @@ class DoseEvent {
     final utc = occurredAt.toUtc();
     return DoseEvent(
       id: '${slot.storageKey}-${utc.microsecondsSinceEpoch}-${type.storageKey}',
-      localDayKey: localDayKey(occurredAt),
+      localDayKey: localDayKeyFor(occurredAt),
       slot: slot,
       type: type,
       occurredAtUtc: utc,
