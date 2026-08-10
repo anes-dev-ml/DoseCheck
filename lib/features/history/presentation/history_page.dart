@@ -328,7 +328,7 @@ class _HistoryDoseDetail extends StatelessWidget {
                   TextButton(
                     onPressed: isBusy ? null : onCorrect,
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      padding: const EdgeInsets.symmetric(),
                       minimumSize: const Size(48, 40),
                       alignment: AlignmentDirectional.centerStart,
                     ),

@@ -65,7 +65,7 @@ class LocalReminderService implements ReminderService {
               .resolvePlatformSpecificImplementation<
                 IOSFlutterLocalNotificationsPlugin
               >()
-              ?.requestPermissions(alert: true, badge: false, sound: true) ??
+              ?.requestPermissions(alert: true, sound: true) ??
           false;
     }
 

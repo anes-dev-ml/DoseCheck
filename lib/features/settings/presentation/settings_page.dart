@@ -118,10 +118,7 @@ class SettingsPage extends StatelessWidget {
                   : () => _confirmReset(context),
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 0,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: Text(l10n.resetData),
             ),
@@ -477,7 +474,6 @@ class _ReminderRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             child: Column(
