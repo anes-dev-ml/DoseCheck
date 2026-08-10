@@ -82,17 +82,19 @@ class _NavigationAssetIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: selected ? 1 : 0.62,
-      duration: const Duration(milliseconds: 160),
-      child: AnimatedScale(
-        scale: selected ? 1.08 : 1,
-        duration: const Duration(milliseconds: 160),
-        curve: Curves.easeOutCubic,
+    final colors = Theme.of(context).colorScheme;
+    final color = selected ? colors.primary : colors.onSurfaceVariant;
+
+    return AnimatedScale(
+      scale: selected ? 1.04 : 0.96,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOutCubic,
+      child: ColorFiltered(
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
         child: Image.asset(
           asset,
-          width: 25,
-          height: 25,
+          width: 24,
+          height: 24,
           fit: BoxFit.contain,
           excludeFromSemantics: true,
         ),
