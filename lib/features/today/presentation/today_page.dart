@@ -72,8 +72,10 @@ class _TodayPageState extends State<TodayPage> {
             _DoseTimelineEntry(
               state: state.morning,
               title: l10n.morningPills,
-              amount: l10n.tabletsAmount(
-                widget.controller.regimen.morningTabletCount,
+              amount: _amountFor(
+                context,
+                state.morning,
+                DoseSlot.morningPills,
               ),
               detail: _detailFor(
                 context,
@@ -88,8 +90,10 @@ class _TodayPageState extends State<TodayPage> {
             _DoseTimelineEntry(
               state: state.second,
               title: l10n.secondPills,
-              amount: l10n.tabletsAmount(
-                widget.controller.regimen.secondTabletCount,
+              amount: _amountFor(
+                context,
+                state.second,
+                DoseSlot.secondPills,
               ),
               detail: _detailFor(
                 context,
@@ -104,9 +108,10 @@ class _TodayPageState extends State<TodayPage> {
             _DoseTimelineEntry(
               state: state.night,
               title: l10n.nightInsulin,
-              amount: l10n.insulinUnits(
-                state.night.event?.amount ??
-                    widget.controller.regimen.nightInsulinUnits,
+              amount: _amountFor(
+                context,
+                state.night,
+                DoseSlot.nightInsulin,
               ),
               detail: _detailFor(
                 context,
@@ -122,6 +127,29 @@ class _TodayPageState extends State<TodayPage> {
         ),
       ),
     );
+  }
+
+  String _amountFor(
+    BuildContext context,
+    DoseSlotState state,
+    DoseSlot slot,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    final recorded = state.resolution == DoseResolution.taken
+        ? state.event?.amount
+        : null;
+
+    return switch (slot) {
+      DoseSlot.morningPills => l10n.tabletsAmount(
+          recorded?.round() ?? widget.controller.regimen.morningTabletCount,
+        ),
+      DoseSlot.secondPills => l10n.tabletsAmount(
+          recorded?.round() ?? widget.controller.regimen.secondTabletCount,
+        ),
+      DoseSlot.nightInsulin => l10n.insulinUnits(
+          recorded ?? widget.controller.regimen.nightInsulinUnits,
+        ),
+    };
   }
 
   String _detailFor(
@@ -340,7 +368,7 @@ class _TodayPageState extends State<TodayPage> {
         return;
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).localDataErrorBody)),
+        SnackBar(content: Text(AppLocalizations.of(context).localDataErrorTitle)),
       );
     }
   }
@@ -421,9 +449,11 @@ class _DaySummary extends StatelessWidget {
     final theme = Theme.of(context);
     final (color, message) = state.hasUncertainty
         ? (_warningColor(theme), l10n.uncertaintyPresent)
-        : state.hasPending
-            ? (theme.colorScheme.primary, l10n.needsAttention)
-            : (theme.colorScheme.primary, l10n.allResolved);
+        : state.hasMissed
+            ? (theme.colorScheme.error, l10n.missed)
+            : state.hasPending
+                ? (theme.colorScheme.primary, l10n.needsAttention)
+                : (theme.colorScheme.primary, l10n.allResolved);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
