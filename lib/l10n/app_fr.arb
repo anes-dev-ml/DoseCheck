@@ -71,7 +71,7 @@
   "defaultUnits": "Unités par défaut",
   "editRoutine": "Modifier la routine",
   "routineEditorTitle": "Modifier la routine",
-  "routineEditorNote": "Ces valeurs décrivent votre plan prescrit actuel. DoseCheck ne choisit jamais une dose à votre place.",
+  "routineEditorNote": "Vérifiez chaque valeur avec votre plan prescrit actuel avant d’enregistrer. DoseCheck ne choisit jamais une dose à votre place.",
   "morningQuantityLabel": "Comprimés du matin",
   "secondQuantityLabel": "Comprimés de la deuxième prise",
   "insulinDefaultLabel": "Insuline du soir par défaut",
