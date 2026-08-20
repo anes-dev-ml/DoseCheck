@@ -12,6 +12,18 @@ The app keeps that answer local to the device, preserves corrections as history 
 
 Built with Flutter. English, French, and Arabic are supported from the same UI, including right-to-left layout for Arabic.
 
+## Product preview
+
+| Today | History |
+| --- | --- |
+| <img src="docs/images/today.jpeg" alt="DoseCheck Today view" width="320"> | <img src="docs/images/history.jpeg" alt="DoseCheck History view" width="320"> |
+
+| Settings | Arabic RTL |
+| --- | --- |
+| <img src="docs/images/settings.jpeg" alt="DoseCheck Settings view" width="320"> | <img src="docs/images/arabic-rtl.jpeg" alt="DoseCheck Arabic right-to-left view" width="320"> |
+
+The screenshots show example routine data used to demonstrate the interface; displayed quantities are not recommendations.
+
 ## What DoseCheck does
 
 ### Today
