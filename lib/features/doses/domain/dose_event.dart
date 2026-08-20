@@ -96,8 +96,8 @@ class DoseEvent {
     localDayFromKey(day);
 
     final parsedTime = DateTime.tryParse(occurredAt);
-    if (parsedTime == null) {
-      throw const FormatException('Invalid dose event timestamp');
+    if (parsedTime == null || !parsedTime.isUtc) {
+      throw const FormatException('Invalid UTC dose event timestamp');
     }
 
     if (rawAmount != null && rawAmount is! num) {
@@ -119,7 +119,7 @@ class DoseEvent {
       localDayKey: day,
       slot: slot,
       type: type,
-      occurredAtUtc: parsedTime.toUtc(),
+      occurredAtUtc: parsedTime,
       amount: amount,
     );
   }
