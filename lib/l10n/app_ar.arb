@@ -71,7 +71,7 @@
   "defaultUnits": "الوحدات الافتراضية",
   "editRoutine": "تعديل الروتين",
   "routineEditorTitle": "تعديل الروتين",
-  "routineEditorNote": "هذه القيم تصف خطتك الموصوفة حاليًا. DoseCheck لا يختار الجرعات نيابةً عنك.",
+  "routineEditorNote": "راجع كل قيمة وفق خطتك الموصوفة الحالية قبل الحفظ. DoseCheck لا يختار الجرعات نيابةً عنك.",
   "morningQuantityLabel": "حبوب الصباح",
   "secondQuantityLabel": "حبوب الجرعة الثانية",
   "insulinDefaultLabel": "إنسولين المساء الافتراضي",
