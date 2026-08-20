@@ -100,7 +100,7 @@
   "defaultUnits": "Default units",
   "editRoutine": "Edit routine",
   "routineEditorTitle": "Edit routine",
-  "routineEditorNote": "These values describe your current prescribed plan. DoseCheck never chooses a dose for you.",
+  "routineEditorNote": "Review every value against your current prescribed plan before saving. DoseCheck never chooses a dose for you.",
   "morningQuantityLabel": "Morning tablets",
   "secondQuantityLabel": "Second tablets",
   "insulinDefaultLabel": "Night insulin default",
