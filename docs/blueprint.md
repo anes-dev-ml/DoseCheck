@@ -113,7 +113,9 @@ Taken events snapshot their recorded amount. Changing the configured routine lat
 - second tablet quantity and minimum interval after the confirmed morning entry;
 - night insulin default amount and reminder time.
 
-The configured values describe the user's existing plan. DoseCheck does not derive or recommend them.
+Fresh installations use deliberately neutral placeholder quantities (`1` morning tablet, `1` second tablet, and `1 U` night insulin) with the existing six-hour interval. They are configuration starting points, not treatment recommendations. The Settings editor explicitly asks the user to verify every value against the current prescribed plan before saving.
+
+Existing installations continue to load their persisted regimen; changing `RegimenPlan.initial()` does not overwrite stored routine data.
 
 ## Persistence
 
@@ -140,6 +142,7 @@ Local notifications are supported on Android and iOS.
 - The second reminder is one-shot and exists only after a confirmed morning `taken` event.
 - Uncertain or missed morning entries never create the second reminder.
 - Once a second reminder is due or the second entry is resolved, no future one-shot reminder is kept for that entry.
+- A second reminder is not scheduled beyond the local day represented by the current Today flow.
 - Android uses inexact-while-idle scheduling; DoseCheck does not request exact-alarm privileges.
 - The Android boot receiver is configured so the notification plugin can restore scheduled notifications after a restart.
 
@@ -157,6 +160,8 @@ Dose events store both:
 - the local calendar day to which the record belongs.
 
 That avoids reinterpreting historical day membership solely from the device's current timezone.
+
+Persisted `occurred_at_utc` values must contain timezone information; ambiguous local timestamp strings are rejected instead of being silently reinterpreted as UTC.
 
 The second-entry availability time is derived from the confirmed morning event plus the configured minimum interval.
 
@@ -192,14 +197,16 @@ DoseCheck treats persistence as authoritative.
 The repository contains focused tests for:
 
 - day-state derivation and second-entry timing;
-- event and settings serialization;
+- event and regimen serialization validation;
+- neutral fresh-install regimen defaults;
 - controller mutation and persistence-failure behavior;
-- reminder schedule decisions;
+- reset partial-failure behavior;
+- reminder schedule decisions, including the local-day boundary;
 - English/French/Arabic layout direction;
 - packaged runtime assets;
 - a widget-level application smoke path.
 
-CI runs formatting checks, static analysis, tests, and an Android build before changes reach the main branch.
+CI runs formatting checks, static analysis, tests, an Android debug build, and a web release build for changes targeting the main branch.
 
 ## Current non-goals
 
