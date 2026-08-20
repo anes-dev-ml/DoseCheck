@@ -49,7 +49,10 @@ void main() {
           controller.stateForDay(now, now: now).morning.resolution,
           DoseResolution.taken,
         );
-        expect(repository.events.single.amount, 2);
+        expect(
+          repository.events.single.amount,
+          controller.regimen.morningTabletCount,
+        );
       },
     );
 
