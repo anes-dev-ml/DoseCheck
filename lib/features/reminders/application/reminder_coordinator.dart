@@ -103,7 +103,6 @@ class _ReminderCoordinatorState extends State<ReminderCoordinator> {
     if (_lastFingerprint == fingerprint) {
       return;
     }
-    _lastFingerprint = fingerprint;
 
     final l10n = AppLocalizations.of(context);
     final messages = ReminderMessages(
@@ -125,9 +124,15 @@ class _ReminderCoordinatorState extends State<ReminderCoordinator> {
         messages: messages,
         now: now,
       );
+      if (mounted) {
+        _lastFingerprint = fingerprint;
+      }
     } catch (_) {
-      // Logging state remains authoritative even if a device rejects scheduling.
-      // Settings exposes reminder availability and permission separately.
+      // A failed device sync must not be cached as successful. A later state or
+      // dependency change will retry the same reminder plan.
+      if (mounted) {
+        _lastFingerprint = null;
+      }
     }
   }
 
