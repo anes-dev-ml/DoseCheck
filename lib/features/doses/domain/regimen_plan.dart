@@ -19,10 +19,7 @@ class RegimenPlan {
     _validatePositive(morningTabletCount, 'morningTabletCount');
     _validateMinutesOfDay(morningTimeMinutes, 'morningTimeMinutes');
     _validatePositive(secondTabletCount, 'secondTabletCount');
-    _validatePositive(
-      secondMinimumIntervalMinutes,
-      'secondMinimumIntervalMinutes',
-    );
+    _validateWholeHourInterval(secondMinimumIntervalMinutes);
     if (!nightInsulinUnits.isFinite || nightInsulinUnits <= 0) {
       throw ArgumentError.value(
         nightInsulinUnits,
@@ -99,22 +96,37 @@ class RegimenPlan {
       throw FormatException('Unsupported regimen schema version: $rawVersion');
     }
 
-    return RegimenPlan(
-      morningTabletCount: _readInt(map, 'morning_tablet_count'),
-      morningTimeMinutes: _readInt(map, 'morning_time_minutes'),
-      secondTabletCount: _readInt(map, 'second_tablet_count'),
-      secondMinimumIntervalMinutes: _readInt(
-        map,
-        'second_minimum_interval_minutes',
-      ),
-      nightInsulinUnits: _readNumber(map, 'night_insulin_units').toDouble(),
-      nightTimeMinutes: _readInt(map, 'night_time_minutes'),
-    );
+    try {
+      return RegimenPlan(
+        morningTabletCount: _readInt(map, 'morning_tablet_count'),
+        morningTimeMinutes: _readInt(map, 'morning_time_minutes'),
+        secondTabletCount: _readInt(map, 'second_tablet_count'),
+        secondMinimumIntervalMinutes: _readInt(
+          map,
+          'second_minimum_interval_minutes',
+        ),
+        nightInsulinUnits: _readNumber(map, 'night_insulin_units').toDouble(),
+        nightTimeMinutes: _readInt(map, 'night_time_minutes'),
+      );
+    } on ArgumentError catch (error) {
+      throw FormatException('Invalid regimen value: ${error.message}');
+    }
   }
 
   static void _validatePositive(int value, String name) {
     if (value <= 0) {
       throw ArgumentError.value(value, name, 'Must be greater than zero.');
+    }
+  }
+
+  static void _validateWholeHourInterval(int value) {
+    _validatePositive(value, 'secondMinimumIntervalMinutes');
+    if (value % 60 != 0) {
+      throw ArgumentError.value(
+        value,
+        'secondMinimumIntervalMinutes',
+        'Must be a whole number of hours.',
+      );
     }
   }
 
