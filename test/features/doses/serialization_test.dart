@@ -78,6 +78,21 @@ void main() {
       expect(restored.occurredAtUtc.isUtc, isTrue);
     });
 
+    test('rejects a persisted timestamp without timezone information', () {
+      final stored = DoseEvent.create(
+        slot: DoseSlot.morningPills,
+        type: DoseEventType.taken,
+        occurredAt: DateTime(2026, 8, 10, 8),
+        amount: 2,
+      ).toMap();
+      stored['occurred_at_utc'] = '2026-08-10T12:00:00.000';
+
+      expect(
+        () => DoseEvent.fromMap(Map<String, dynamic>.from(stored)),
+        throwsFormatException,
+      );
+    });
+
     test('stores a whole-number pill amount on taken entries', () {
       final source = DoseEvent.create(
         slot: DoseSlot.morningPills,
