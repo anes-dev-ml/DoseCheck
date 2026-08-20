@@ -1,9 +1,13 @@
 name: Flutter checks
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -41,3 +45,6 @@ jobs:
 
       - name: Build Android debug APK
         run: flutter build apk --debug
+
+      - name: Build web release
+        run: flutter build web --release
