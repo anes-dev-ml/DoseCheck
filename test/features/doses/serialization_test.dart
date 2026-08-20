@@ -5,6 +5,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('RegimenPlan serialization', () {
+    test('fresh-install defaults are neutral placeholders', () {
+      const plan = RegimenPlan.initial();
+
+      expect(plan.morningTabletCount, 1);
+      expect(plan.secondTabletCount, 1);
+      expect(plan.secondMinimumIntervalMinutes, 6 * 60);
+      expect(plan.nightInsulinUnits, 1);
+    });
+
     test('round-trips the configured routine', () {
       final plan = RegimenPlan(
         morningTabletCount: 2,
