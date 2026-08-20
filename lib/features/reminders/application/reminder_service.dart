@@ -1,4 +1,5 @@
 import 'package:dosecheck/features/doses/domain/dose_day_state.dart';
+import 'package:dosecheck/features/doses/domain/dose_event.dart';
 import 'package:dosecheck/features/doses/domain/regimen_plan.dart';
 
 class ReminderMessages {
@@ -21,6 +22,68 @@ class ReminderMessages {
   final String secondBody;
   final String nightTitle;
   final String nightBody;
+}
+
+class ReminderSchedulePlan {
+  const ReminderSchedulePlan._({
+    required this.enabled,
+    required this.morningDayOffset,
+    required this.nightDayOffset,
+    required this.secondAt,
+  });
+
+  factory ReminderSchedulePlan.build({
+    required bool enabled,
+    required RegimenPlan regimen,
+    required DoseDayState today,
+    required DateTime now,
+  }) {
+    if (!enabled) {
+      return const ReminderSchedulePlan._(
+        enabled: false,
+        morningDayOffset: 0,
+        nightDayOffset: 0,
+        secondAt: null,
+      );
+    }
+
+    final localNow = now.toLocal();
+    final currentMinutes = (localNow.hour * 60) + localNow.minute;
+
+    int dayOffset({required int minutesOfDay, required bool resolved}) {
+      if (resolved || minutesOfDay <= currentMinutes) {
+        return 1;
+      }
+      return 0;
+    }
+
+    final secondAvailableAt = today.second.availableAt;
+    final secondAt =
+        today.morning.event?.type == DoseEventType.taken &&
+            today.second.resolution == DoseResolution.pending &&
+            secondAvailableAt != null &&
+            secondAvailableAt.isAfter(localNow)
+        ? secondAvailableAt
+        : null;
+
+    return ReminderSchedulePlan._(
+      enabled: true,
+      morningDayOffset: dayOffset(
+        minutesOfDay: regimen.morningTimeMinutes,
+        resolved: today.morning.isResolved,
+      ),
+      nightDayOffset: dayOffset(
+        minutesOfDay: regimen.nightTimeMinutes,
+        resolved: today.night.isResolved,
+      ),
+      secondAt: secondAt,
+    );
+  }
+
+  final bool enabled;
+  final int morningDayOffset;
+  final int nightDayOffset;
+  final DateTime? secondAt;
 }
 
 enum ReminderAvailability { available, unsupported, unavailable }
