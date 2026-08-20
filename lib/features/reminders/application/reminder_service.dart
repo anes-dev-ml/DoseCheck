@@ -58,11 +58,14 @@ class ReminderSchedulePlan {
     }
 
     final secondAvailableAt = today.second.availableAt;
+    final staysOnTrackedDay =
+        secondAvailableAt != null &&
+        _sameLocalDay(secondAvailableAt, today.localDayKey);
     final secondAt =
         today.morning.event?.type == DoseEventType.taken &&
             today.second.resolution == DoseResolution.pending &&
-            secondAvailableAt != null &&
-            secondAvailableAt.isAfter(localNow)
+            staysOnTrackedDay &&
+            secondAvailableAt!.isAfter(localNow)
         ? secondAvailableAt
         : null;
 
@@ -84,6 +87,14 @@ class ReminderSchedulePlan {
   final int morningDayOffset;
   final int nightDayOffset;
   final DateTime? secondAt;
+}
+
+bool _sameLocalDay(DateTime value, String localDayKey) {
+  final local = value.toLocal();
+  final key = '${local.year.toString().padLeft(4, '0')}-'
+      '${local.month.toString().padLeft(2, '0')}-'
+      '${local.day.toString().padLeft(2, '0')}';
+  return key == localDayKey;
 }
 
 enum ReminderAvailability { available, unsupported, unavailable }
