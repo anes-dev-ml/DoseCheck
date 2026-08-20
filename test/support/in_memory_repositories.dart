@@ -13,6 +13,7 @@ class InMemoryDoseRepository implements DoseRepository {
   final List<DoseEvent> events;
   Completer<void>? appendBarrier;
   Object? appendError;
+  Object? clearError;
 
   @override
   Future<List<DoseEvent>> readAll() async => List.unmodifiable(events);
@@ -32,6 +33,10 @@ class InMemoryDoseRepository implements DoseRepository {
 
   @override
   Future<void> clearAll() async {
+    final error = clearError;
+    if (error != null) {
+      throw error;
+    }
     events.clear();
   }
 }
@@ -46,6 +51,7 @@ class InMemorySettingsRepository implements SettingsRepository {
   RegimenPlan regimen;
   AppPreferences preferences;
   Object? writeError;
+  Object? clearError;
 
   @override
   Future<RegimenPlan> readRegimen() async => regimen;
@@ -73,6 +79,10 @@ class InMemorySettingsRepository implements SettingsRepository {
 
   @override
   Future<void> clearAll() async {
+    final error = clearError;
+    if (error != null) {
+      throw error;
+    }
     regimen = const RegimenPlan.initial();
     preferences = const AppPreferences.initial();
   }
