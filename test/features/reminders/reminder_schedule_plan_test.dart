@@ -25,13 +25,12 @@ void main() {
     );
   }
 
-  DoseDayState stateAt(DateTime now, [List<DoseEvent> events = const []]) {
-    return DoseDayState.derive(
-      plan: regimen,
-      day: day,
-      now: now,
-      events: events,
-    );
+  DoseDayState stateAt(
+    DateTime now, [
+    List<DoseEvent> events = const [],
+    RegimenPlan plan = regimen,
+  ]) {
+    return DoseDayState.derive(plan: plan, day: day, now: now, events: events);
   }
 
   group('ReminderSchedulePlan', () {
@@ -167,6 +166,28 @@ void main() {
         regimen: regimen,
         today: stateAt(atBoundary, [morning]),
         now: atBoundary,
+      );
+
+      expect(plan.secondAt, isNull);
+    });
+
+    test('second reminder is suppressed when the interval crosses midnight', () {
+      final latePlan = regimen.copyWith(secondMinimumIntervalMinutes: 6 * 60);
+      final morning = event(
+        DoseSlot.morningPills,
+        DoseEventType.taken,
+        DateTime(2026, 8, 10, 20, 30),
+      );
+      final now = DateTime(2026, 8, 10, 21);
+      final today = stateAt(now, [morning], latePlan);
+
+      expect(today.second.availableAt, DateTime(2026, 8, 11, 2, 30));
+
+      final plan = ReminderSchedulePlan.build(
+        enabled: true,
+        regimen: latePlan,
+        today: today,
+        now: now,
       );
 
       expect(plan.secondAt, isNull);
