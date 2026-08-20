@@ -1,11 +1,11 @@
 {
-    "name": "dosecheck",
-    "short_name": "dosecheck",
+    "name": "DoseCheck",
+    "short_name": "DoseCheck",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F3F5F1",
+    "theme_color": "#386A53",
+    "description": "A local-first medication log for clear, traceable daily dose records.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
