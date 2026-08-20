@@ -66,7 +66,7 @@ class ReminderSchedulePlan {
         today.morning.event?.type == DoseEventType.taken &&
             today.second.resolution == DoseResolution.pending &&
             staysOnTrackedDay &&
-            secondAvailableAt!.isAfter(localNow)
+            secondAvailableAt.isAfter(localNow)
         ? secondAvailableAt
         : null;
 
