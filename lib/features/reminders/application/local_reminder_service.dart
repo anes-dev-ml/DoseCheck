@@ -1,5 +1,4 @@
 import 'package:dosecheck/features/doses/domain/dose_day_state.dart';
-import 'package:dosecheck/features/doses/domain/dose_event.dart';
 import 'package:dosecheck/features/doses/domain/regimen_plan.dart';
 import 'package:dosecheck/features/reminders/application/reminder_service.dart';
 import 'package:flutter/foundation.dart';
@@ -81,13 +80,20 @@ class LocalReminderService implements ReminderService {
     DateTime? now,
   }) async {
     await cancelAll();
-    if (!enabled) {
-      return;
-    }
 
     final reference = now == null
         ? tz.TZDateTime.now(tz.local)
         : tz.TZDateTime.from(now, tz.local);
+    final plan = ReminderSchedulePlan.build(
+      enabled: enabled,
+      regimen: regimen,
+      today: today,
+      now: reference,
+    );
+    if (!plan.enabled) {
+      return;
+    }
+
     final details = _details(messages);
 
     await _scheduleDaily(
@@ -97,7 +103,7 @@ class LocalReminderService implements ReminderService {
       minutesOfDay: regimen.morningTimeMinutes,
       reference: reference,
       details: details,
-      startTomorrow: today.morning.isResolved,
+      dayOffset: plan.morningDayOffset,
     );
     await _scheduleDaily(
       id: _nightId,
@@ -106,22 +112,16 @@ class LocalReminderService implements ReminderService {
       minutesOfDay: regimen.nightTimeMinutes,
       reference: reference,
       details: details,
-      startTomorrow: today.night.isResolved,
+      dayOffset: plan.nightDayOffset,
     );
 
-    final availableAt = today.second.availableAt;
-    final shouldScheduleSecond =
-        today.morning.event?.type == DoseEventType.taken &&
-        today.second.resolution == DoseResolution.pending &&
-        availableAt != null &&
-        availableAt.isAfter(reference.toLocal());
-
-    if (shouldScheduleSecond) {
+    final secondAt = plan.secondAt;
+    if (secondAt != null) {
       await _plugin.zonedSchedule(
         id: _secondId,
         title: messages.secondTitle,
         body: messages.secondBody,
-        scheduledDate: tz.TZDateTime.from(availableAt, tz.local),
+        scheduledDate: tz.TZDateTime.from(secondAt, tz.local),
         notificationDetails: details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
@@ -142,28 +142,16 @@ class LocalReminderService implements ReminderService {
     required int minutesOfDay,
     required tz.TZDateTime reference,
     required NotificationDetails details,
-    required bool startTomorrow,
+    required int dayOffset,
   }) async {
-    final initialDayOffset = startTomorrow ? 1 : 0;
-    var scheduled = tz.TZDateTime(
+    final scheduled = tz.TZDateTime(
       tz.local,
       reference.year,
       reference.month,
-      reference.day + initialDayOffset,
+      reference.day + dayOffset,
       minutesOfDay ~/ 60,
       minutesOfDay % 60,
     );
-
-    if (!startTomorrow && !scheduled.isAfter(reference)) {
-      scheduled = tz.TZDateTime(
-        tz.local,
-        reference.year,
-        reference.month,
-        reference.day + 1,
-        minutesOfDay ~/ 60,
-        minutesOfDay % 60,
-      );
-    }
 
     await _plugin.zonedSchedule(
       id: id,
