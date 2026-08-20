@@ -10,7 +10,7 @@ void main() {
         morningTabletCount: 2,
         morningTimeMinutes: 7 * 60 + 45,
         secondTabletCount: 2,
-        secondMinimumIntervalMinutes: 390,
+        secondMinimumIntervalMinutes: 6 * 60,
         nightInsulinUnits: 7.5,
         nightTimeMinutes: 21 * 60 + 30,
       );
@@ -28,11 +28,35 @@ void main() {
           morningTabletCount: 2,
           morningTimeMinutes: -1,
           secondTabletCount: 2,
-          secondMinimumIntervalMinutes: 360,
+          secondMinimumIntervalMinutes: 6 * 60,
           nightInsulinUnits: 8,
           nightTimeMinutes: 22 * 60,
         ),
         throwsArgumentError,
+      );
+    });
+
+    test('rejects interval precision the editor cannot represent', () {
+      expect(
+        () => RegimenPlan(
+          morningTabletCount: 2,
+          morningTimeMinutes: 8 * 60,
+          secondTabletCount: 2,
+          secondMinimumIntervalMinutes: 390,
+          nightInsulinUnits: 8,
+          nightTimeMinutes: 22 * 60,
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects unsupported persisted interval precision', () {
+      final stored = const RegimenPlan.initial().toMap();
+      stored['second_minimum_interval_minutes'] = 390;
+
+      expect(
+        () => RegimenPlan.fromMap(Map<String, dynamic>.from(stored)),
+        throwsFormatException,
       );
     });
   });
