@@ -27,7 +27,6 @@ class HiveSettingsRepository implements SettingsRepository {
   @override
   Future<void> writeRegimen(RegimenPlan plan) async {
     await _box.put(_regimenKey, plan.toMap());
-    await _box.flush();
   }
 
   @override
@@ -48,12 +47,10 @@ class HiveSettingsRepository implements SettingsRepository {
   @override
   Future<void> writePreferences(AppPreferences preferences) async {
     await _box.put(_preferencesKey, preferences.toMap());
-    await _box.flush();
   }
 
   @override
   Future<void> clearAll() async {
     await _box.clear();
-    await _box.flush();
   }
 }
