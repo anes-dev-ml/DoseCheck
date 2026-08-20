@@ -40,11 +40,11 @@ class RegimenPlan {
   }
 
   const RegimenPlan.initial()
-    : morningTabletCount = 2,
+    : morningTabletCount = 1,
       morningTimeMinutes = 8 * 60,
-      secondTabletCount = 2,
+      secondTabletCount = 1,
       secondMinimumIntervalMinutes = 6 * 60,
-      nightInsulinUnits = 8,
+      nightInsulinUnits = 1,
       nightTimeMinutes = 22 * 60;
 
   static const int schemaVersion = 1;
