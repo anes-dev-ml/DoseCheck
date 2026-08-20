@@ -4,6 +4,8 @@ import 'package:dosecheck/app/app_controller.dart';
 import 'package:dosecheck/features/doses/domain/dose_day_state.dart';
 import 'package:dosecheck/features/doses/domain/dose_event.dart';
 import 'package:dosecheck/features/doses/domain/dose_slot.dart';
+import 'package:dosecheck/features/doses/domain/regimen_plan.dart';
+import 'package:dosecheck/features/settings/domain/app_preferences.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/in_memory_repositories.dart';
@@ -95,6 +97,7 @@ void main() {
         controller.stateForDay(now, now: now).morning.resolution,
         DoseResolution.pending,
       );
+      expect(controller.isMutating, isFalse);
     });
 
     test(
@@ -159,5 +162,103 @@ void main() {
         DoseResolution.pending,
       );
     });
+
+    test('failed regimen persistence leaves the active regimen unchanged', () async {
+      final settings = InMemorySettingsRepository();
+      final controller = await createController(settingsRepository: settings);
+      final original = controller.regimen;
+      final updated = original.copyWith(morningTabletCount: 3);
+      settings.writeError = StateError('settings unavailable');
+
+      await expectLater(controller.updateRegimen(updated), throwsStateError);
+
+      expect(controller.regimen, original);
+      expect(settings.regimen, original);
+      expect(controller.isMutating, isFalse);
+    });
+
+    test(
+      'failed preference persistence leaves the active preferences unchanged',
+      () async {
+        final settings = InMemorySettingsRepository();
+        final controller = await createController(settingsRepository: settings);
+        const original = AppPreferences.initial();
+        settings.writeError = StateError('settings unavailable');
+
+        await expectLater(controller.updateLanguage('fr'), throwsStateError);
+
+        expect(controller.preferences, original);
+        expect(settings.preferences, original);
+        expect(controller.isMutating, isFalse);
+      },
+    );
+
+    test('reset never clears dose history when settings reset fails', () async {
+      final original = DoseEvent.create(
+        slot: DoseSlot.morningPills,
+        type: DoseEventType.taken,
+        occurredAt: DateTime(2026, 8, 10, 8),
+        amount: 2,
+      );
+      final doseRepository = InMemoryDoseRepository(initialEvents: [original]);
+      final regimen = const RegimenPlan.initial().copyWith(
+        morningTabletCount: 3,
+      );
+      final preferences = AppPreferences(
+        languageCode: 'fr',
+        remindersEnabled: true,
+      );
+      final settingsRepository = InMemorySettingsRepository(
+        regimen: regimen,
+        preferences: preferences,
+      )..clearError = StateError('settings reset failed');
+      final controller = await createController(
+        doseRepository: doseRepository,
+        settingsRepository: settingsRepository,
+      );
+
+      await expectLater(controller.resetLocalData(), throwsStateError);
+
+      expect(doseRepository.events, [original]);
+      expect(controller.events, [original]);
+      expect(controller.regimen, regimen);
+      expect(controller.preferences, preferences);
+      expect(controller.isMutating, isFalse);
+    });
+
+    test(
+      'failed history clear reloads the partial persisted reset safely',
+      () async {
+        final original = DoseEvent.create(
+          slot: DoseSlot.morningPills,
+          type: DoseEventType.taken,
+          occurredAt: DateTime(2026, 8, 10, 8),
+          amount: 2,
+        );
+        final doseRepository = InMemoryDoseRepository(initialEvents: [original])
+          ..clearError = StateError('history reset failed');
+        final settingsRepository = InMemorySettingsRepository(
+          regimen: const RegimenPlan.initial().copyWith(
+            morningTabletCount: 3,
+          ),
+          preferences: AppPreferences(
+            languageCode: 'fr',
+            remindersEnabled: true,
+          ),
+        );
+        final controller = await createController(
+          doseRepository: doseRepository,
+          settingsRepository: settingsRepository,
+        );
+
+        await expectLater(controller.resetLocalData(), throwsStateError);
+
+        expect(doseRepository.events, [original]);
+        expect(controller.events, [original]);
+        expect(controller.regimen, const RegimenPlan.initial());
+        expect(controller.preferences, const AppPreferences.initial());
+        expect(controller.isMutating, isFalse);
+      },
+    );
   });
 }
