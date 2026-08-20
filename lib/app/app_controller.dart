@@ -195,8 +195,10 @@ class DoseCheckController extends ChangeNotifier {
 
     _setMutating(true);
     try {
-      await _doseRepository.clearAll();
+      // Keep dose history as the last destructive step. If settings cannot be
+      // reset, the user's event history remains untouched.
       await _settingsRepository.clearAll();
+      await _doseRepository.clearAll();
       _events = [];
       _regimen = const RegimenPlan.initial();
       _preferences = const AppPreferences.initial();
