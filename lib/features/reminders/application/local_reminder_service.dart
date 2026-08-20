@@ -16,6 +16,7 @@ class LocalReminderService implements ReminderService {
   static const _channelId = 'dosecheck_medication_reminders';
 
   final FlutterLocalNotificationsPlugin _plugin;
+  int? _lastSuccessfulFingerprint;
 
   static Future<ReminderService> create() async {
     if (kIsWeb ||
@@ -79,8 +80,6 @@ class LocalReminderService implements ReminderService {
     required ReminderMessages messages,
     DateTime? now,
   }) async {
-    await cancelAll();
-
     final reference = now == null
         ? tz.TZDateTime.now(tz.local)
         : tz.TZDateTime.from(now, tz.local);
@@ -90,7 +89,31 @@ class LocalReminderService implements ReminderService {
       today: today,
       now: reference,
     );
+    final fingerprint = Object.hashAll([
+      plan.enabled,
+      plan.morningDayOffset,
+      plan.nightDayOffset,
+      plan.secondAt?.microsecondsSinceEpoch,
+      regimen.morningTimeMinutes,
+      regimen.nightTimeMinutes,
+      messages.channelName,
+      messages.channelDescription,
+      messages.morningTitle,
+      messages.morningBody,
+      messages.secondTitle,
+      messages.secondBody,
+      messages.nightTitle,
+      messages.nightBody,
+    ]);
+
+    if (_lastSuccessfulFingerprint == fingerprint) {
+      return;
+    }
+
+    _lastSuccessfulFingerprint = null;
+    await _cancelOwned();
     if (!plan.enabled) {
+      _lastSuccessfulFingerprint = fingerprint;
       return;
     }
 
@@ -126,10 +149,17 @@ class LocalReminderService implements ReminderService {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
     }
+
+    _lastSuccessfulFingerprint = fingerprint;
   }
 
   @override
   Future<void> cancelAll() async {
+    _lastSuccessfulFingerprint = null;
+    await _cancelOwned();
+  }
+
+  Future<void> _cancelOwned() async {
     await _plugin.cancel(id: _morningId);
     await _plugin.cancel(id: _secondId);
     await _plugin.cancel(id: _nightId);
