@@ -16,6 +16,7 @@ class LocalReminderService implements ReminderService {
   static const _channelId = 'dosecheck_medication_reminders';
 
   final FlutterLocalNotificationsPlugin _plugin;
+  Future<void> _operationTail = Future<void>.value();
   int? _lastSuccessfulFingerprint;
 
   static Future<ReminderService> create() async {
@@ -74,6 +75,24 @@ class LocalReminderService implements ReminderService {
 
   @override
   Future<void> sync({
+    required bool enabled,
+    required RegimenPlan regimen,
+    required DoseDayState today,
+    required ReminderMessages messages,
+    DateTime? now,
+  }) {
+    return _enqueue(
+      () => _syncNow(
+        enabled: enabled,
+        regimen: regimen,
+        today: today,
+        messages: messages,
+        now: now,
+      ),
+    );
+  }
+
+  Future<void> _syncNow({
     required bool enabled,
     required RegimenPlan regimen,
     required DoseDayState today,
@@ -154,9 +173,20 @@ class LocalReminderService implements ReminderService {
   }
 
   @override
-  Future<void> cancelAll() async {
-    _lastSuccessfulFingerprint = null;
-    await _cancelOwned();
+  Future<void> cancelAll() {
+    return _enqueue(() async {
+      _lastSuccessfulFingerprint = null;
+      await _cancelOwned();
+    });
+  }
+
+  Future<void> _enqueue(Future<void> Function() operation) {
+    final next = _operationTail.then((_) => operation());
+    _operationTail = next.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace __) {},
+    );
+    return next;
   }
 
   Future<void> _cancelOwned() async {
