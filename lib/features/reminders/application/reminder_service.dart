@@ -1,3 +1,4 @@
+import 'package:dosecheck/core/time/local_day.dart';
 import 'package:dosecheck/features/doses/domain/dose_day_state.dart';
 import 'package:dosecheck/features/doses/domain/dose_event.dart';
 import 'package:dosecheck/features/doses/domain/regimen_plan.dart';
@@ -60,7 +61,7 @@ class ReminderSchedulePlan {
     final secondAvailableAt = today.second.availableAt;
     final staysOnTrackedDay =
         secondAvailableAt != null &&
-        _sameLocalDay(secondAvailableAt, today.localDayKey);
+        localDayKeyFor(secondAvailableAt) == today.localDayKey;
     final secondAt =
         today.morning.event?.type == DoseEventType.taken &&
             today.second.resolution == DoseResolution.pending &&
@@ -87,14 +88,6 @@ class ReminderSchedulePlan {
   final int morningDayOffset;
   final int nightDayOffset;
   final DateTime? secondAt;
-}
-
-bool _sameLocalDay(DateTime value, String localDayKey) {
-  final local = value.toLocal();
-  final key = '${local.year.toString().padLeft(4, '0')}-'
-      '${local.month.toString().padLeft(2, '0')}-'
-      '${local.day.toString().padLeft(2, '0')}';
-  return key == localDayKey;
 }
 
 enum ReminderAvailability { available, unsupported, unavailable }
