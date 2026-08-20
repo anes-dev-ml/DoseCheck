@@ -5,10 +5,11 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = dosecheck
+PRODUCT_NAME = DoseCheck
 
-// The application's bundle identifier
+// The application's bundle identifier. Keep this internal id until a final
+// distribution identifier is chosen.
 PRODUCT_BUNDLE_IDENTIFIER = com.example.dosecheck
 
-// The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+// The copyright displayed in application information.
+PRODUCT_COPYRIGHT = Copyright © 2026. All rights reserved.
