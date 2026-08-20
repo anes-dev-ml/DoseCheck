@@ -26,12 +26,10 @@ class HiveDoseRepository implements DoseRepository {
   @override
   Future<void> append(DoseEvent event) async {
     await _box.add(event.toMap());
-    await _box.flush();
   }
 
   @override
   Future<void> clearAll() async {
     await _box.clear();
-    await _box.flush();
   }
 }
